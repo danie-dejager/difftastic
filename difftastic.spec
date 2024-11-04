@@ -9,6 +9,7 @@ Source0: https://github.com/Wilfred/difftastic/archive/refs/tags/%{version}.tar.
 
 BuildRequires: curl
 BuildRequires: gcc
+BuildRequires: gcc-c++
 BuildRequires: make
 BuildRequires: gzip
 BuildRequires: upx
