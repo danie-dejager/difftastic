@@ -5,7 +5,7 @@ Summary: a structural diff that understands syntax
 
 License: MIT
 URL: https://github.com/Wilfred/difftastic
-Source0: %{version}.tar.gz
+Source0: https://github.com/Wilfred/difftastic/archive/refs/tags/%{version}.tar.gz
 
 BuildRequires: curl
 BuildRequires: gcc
