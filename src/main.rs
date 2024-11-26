@@ -161,6 +161,29 @@ fn main() {
                 }
             }
         }
+        Mode::DumpSyntaxDot {
+            path,
+            ignore_comments,
+            language_overrides,
+        } => {
+            let path = Path::new(&path);
+            let bytes = read_or_die(path);
+            let src = String::from_utf8_lossy(&bytes).to_string();
+
+            let language = guess(path, &src, &language_overrides);
+            match language {
+                Some(lang) => {
+                    let ts_lang = tsp::from_language(lang);
+                    let arena = Arena::new();
+                    let ast = tsp::parse(&arena, &src, &ts_lang, ignore_comments);
+                    init_all_info(&ast, &[]);
+                    syntax::print_as_dot(&ast);
+                }
+                None => {
+                    eprintln!("No tree-sitter parser for file: {:?}", path);
+                }
+            }
+        }
         Mode::ListLanguages {
             use_color,
             language_overrides,
@@ -383,7 +406,7 @@ fn diff_file(
     // a trailing newline, e.g. "foo\n\bar\n" versus "foo". We want to
     // consider `foo` to be unchanged in this case.
     //
-    // Theoretically a tree-sitter parser coud change its AST due to
+    // Theoretically a tree-sitter parser could change its AST due to
     // the additional trailing newline, but it seems vanishingly
     // unlikely.
     if !lhs_src.is_empty() && !lhs_src.ends_with('\n') {
@@ -523,13 +546,12 @@ fn diff_file_content(
     diff_options: &DiffOptions,
     overrides: &[(LanguageOverride, Vec<glob::Pattern>)],
 ) -> DiffResult {
-    let (guess_src, guess_path) = match rhs_path {
-        FileArgument::NamedPath(path) => (&rhs_src, Path::new(path)),
-        FileArgument::Stdin => (&rhs_src, Path::new(&display_path)),
-        FileArgument::DevNull => (&lhs_src, Path::new(&display_path)),
+    let guess_src = match rhs_path {
+        FileArgument::DevNull => &lhs_src,
+        _ => &rhs_src,
     };
 
-    let language = guess(guess_path, guess_src, overrides);
+    let language = guess(Path::new(display_path), guess_src, overrides);
     let lang_config = language.map(|lang| (lang, tsp::from_language(lang)));
 
     if lhs_src == rhs_src {

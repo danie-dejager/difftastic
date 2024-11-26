@@ -124,6 +124,15 @@ fn app() -> clap::Command<'static> {
                 ).help_heading("DEBUG OPTIONS"),
         )
         .arg(
+            Arg::new("dump-syntax-dot")
+                .long("dump-syntax-dot")
+                .takes_value(true)
+                .value_name("PATH")
+                .long_help(
+                    "Parse a single file with tree-sitter and display the difftastic syntax tree, as a DOT graph.",
+                ).help_heading("DEBUG OPTIONS"),
+        )
+        .arg(
             Arg::new("dump-ts")
                 .long("dump-ts")
                 .takes_value(true)
@@ -485,6 +494,11 @@ pub(crate) enum Mode {
         ignore_comments: bool,
         language_overrides: Vec<(LanguageOverride, Vec<glob::Pattern>)>,
     },
+    DumpSyntaxDot {
+        path: String,
+        ignore_comments: bool,
+        language_overrides: Vec<(LanguageOverride, Vec<glob::Pattern>)>,
+    },
 }
 
 fn common_path_suffix(lhs_path: &Path, rhs_path: &Path) -> Option<String> {
@@ -542,7 +556,13 @@ fn build_display_path(lhs_path: &FileArgument, rhs_path: &FileArgument) -> Strin
 
             match common_path_suffix(lhs, rhs) {
                 Some(common_suffix) => common_suffix,
-                None => rhs.display().to_string(),
+                None => {
+                    if rhs.extension().is_some() {
+                        rhs.display().to_string()
+                    } else {
+                        lhs.display().to_string()
+                    }
+                }
             }
         }
         (FileArgument::NamedPath(p), _) | (_, FileArgument::NamedPath(p)) => {
@@ -638,6 +658,14 @@ pub(crate) fn parse_args() -> Mode {
 
     if let Some(path) = matches.value_of("dump-syntax") {
         return Mode::DumpSyntax {
+            path: path.to_owned(),
+            ignore_comments,
+            language_overrides,
+        };
+    }
+
+    if let Some(path) = matches.value_of("dump-syntax-dot") {
+        return Mode::DumpSyntaxDot {
             path: path.to_owned(),
             ignore_comments,
             language_overrides,

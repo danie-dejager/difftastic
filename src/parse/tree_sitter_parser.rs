@@ -1563,6 +1563,7 @@ fn find_delim_positions(
     None
 }
 
+#[derive(Debug)]
 pub(crate) struct HighlightedNodeIds {
     keyword_ids: HashSet<usize>,
     comment_ids: HashSet<usize>,
@@ -1649,6 +1650,11 @@ fn syntax_from_cursor<'a>(
         //
         // Also, if this node is highlighted as a comment, treat it as
         // an atom unconditionally.
+        atom_from_cursor(arena, src, nl_pos, cursor, highlights, ignore_comments)
+    } else if highlights.keyword_ids.contains(&node.id()) && node.child_count() == 1 {
+        // If this list has a single child, and the list itself (not
+        // the child) is marked as a keyword, treat it as an atom with
+        // keyword highlighting.
         atom_from_cursor(arena, src, nl_pos, cursor, highlights, ignore_comments)
     } else if node.child_count() > 0 {
         Some(list_from_cursor(

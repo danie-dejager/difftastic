@@ -139,7 +139,7 @@ impl<'a> fmt::Debug for Syntax<'a> {
                 ..
             } => {
                 let mut ds = f.debug_struct(&format!(
-                    "List id:{} content:{}",
+                    "List id:{} content_id:{}",
                     self.id(),
                     self.content_id()
                 ));
@@ -169,7 +169,7 @@ impl<'a> fmt::Debug for Syntax<'a> {
                 ..
             } => {
                 let mut ds = f.debug_struct(&format!(
-                    "Atom id:{} content:{}",
+                    "Atom id:{} content_id:{}",
                     self.id(),
                     self.content_id()
                 ));
@@ -258,7 +258,11 @@ impl<'a> Syntax<'a> {
             content = &content[..content.len() - 1];
         }
 
-        if kind == AtomKind::Comment && content.ends_with('\n') {
+        // If a parser adds a trailing newline to the atom, discard
+        // it. It produces worse diffs: we'd rather align on real
+        // content, and complicates handling of trailing newlines at
+        // the end of the file.
+        if content.ends_with('\n') {
             position.pop();
             content = &content[..content.len() - 1];
         }
@@ -363,6 +367,43 @@ pub(crate) fn init_all_info<'a>(lhs_roots: &[&'a Syntax<'a>], rhs_roots: &[&'a S
     init_info(lhs_roots, rhs_roots);
     init_next_prev(lhs_roots);
     init_next_prev(rhs_roots);
+}
+
+pub(crate) fn print_as_dot<'a>(roots: &[&'a Syntax<'a>]) {
+    println!("digraph {{");
+    print_as_dot_(roots);
+    println!("}}");
+}
+
+fn print_as_dot_<'a>(nodes: &[&'a Syntax<'a>]) {
+    for node in nodes {
+        let label = match node {
+            List {
+                open_content,
+                close_content,
+                ..
+            } => {
+                if open_content != "" {
+                    format!("[label=\"{open_content}{close_content}\"]")
+                } else {
+                    "[style=dotted]".to_owned()
+                }
+            }
+            Atom { content, .. } => {
+                let content = content.replace("\"", "\\\"");
+                format!("[label=\"{content}\"]")
+            }
+        };
+
+        println!("  id{} {};", node.id().get(), label);
+
+        if let List { children, .. } = node {
+            for child in children {
+                println!("  id{} -> id{};", node.id().get(), child.id().get());
+            }
+            print_as_dot_(children);
+        }
+    }
 }
 
 fn init_info<'a>(lhs_roots: &[&'a Syntax<'a>], rhs_roots: &[&'a Syntax<'a>]) {
