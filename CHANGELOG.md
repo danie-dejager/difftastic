@@ -1,4 +1,10 @@
-## 0.62 (unreleased)
+## 0.63 (unreleased)
+
+### Parsing
+
+Updated to the latest tree-sitter parser for Make and YAML.
+
+## 0.62 (released 20th December 2024)
 
 ### Diffing
 
@@ -10,9 +16,19 @@ with YAML.
 
 Improved language detection when one argument is a named pipe.
 
+Updated to the latest tree-sitter parser for Bash, C, C++, C#, CSS,
+Go, Haskell, HTML, Java, JavaScript, JSON, Julia, Lua, Objective-C,
+OCaml, PHP, Python, Ruby, Scala, TOML, TypeScript and XML.
+
 ### Syntax Highlighting
 
 Improved syntax highlighting, particularly for keywords.
+
+### Build
+
+difftastic now requires Rust 1.74.1 to build.
+
+Prebuilt packages for macOS on x86-64 are now built on macOS 13.
 
 ## 0.61 (released 24th October 2024)
 

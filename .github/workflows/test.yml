@@ -10,11 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          # Operating systems available: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+          # Operating systems available: https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
-          # mac-latest (currently mac-14) is an ARM device, so use macos-12 to get Intel.
-          # Update annoucement: https://github.blog/changelog/2024-04-01-macos-14-sonoma-is-generally-available-and-the-latest-macos-runner-image/
-          - { target: x86_64-apple-darwin, os: macos-12 }
+          # mac-latest (currently mac-14) is an ARM device, so use macos-13 to get Intel.
+          - { target: x86_64-apple-darwin, os: macos-13 }
           - { target: x86_64-pc-windows-msvc, os: windows-latest }
 
           - { target: aarch64-unknown-linux-gnu, os: ubuntu-20.04, use-cross: true }
@@ -37,7 +36,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@1.66.0
+      uses: dtolnay/rust-toolchain@1.74.1
       with:
         targets: ${{ matrix.job.target }}
 
@@ -66,7 +65,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.66.0
+      - uses: dtolnay/rust-toolchain@1.74.1
       # This runs tests that rely on the MIME database being present.
       - run: cargo test -- --ignored
 
@@ -83,7 +82,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.66.0
+      - uses: dtolnay/rust-toolchain@1.74.1
       - name: Generate output for all sample files
         run: ./sample_files/compare_all.sh
       - name: Verify output is unchanged
@@ -94,7 +93,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.66.0
+      - uses: dtolnay/rust-toolchain@1.74.1
       - run: cargo package --allow-dirty
 
   fmt:
@@ -102,7 +101,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.66.0
+      - uses: dtolnay/rust-toolchain@1.74.1
       - run: cargo fmt --all -- --check
 
   actionlint:

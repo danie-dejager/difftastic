@@ -41,12 +41,6 @@ impl TreeSitterParser {
                 .flag_if_supported("-Wno-implicit-fallthrough")
                 .flag_if_supported("-Wno-unused-parameter")
                 .flag_if_supported("-Wno-ignored-qualifiers")
-                // Ignore warning from tree-sitter-html.
-                .flag_if_supported("-Wno-sign-compare")
-                // Ignore warning from tree-sitter-ruby.
-                .flag_if_supported("-Wno-parentheses")
-                // Ignore warning from tree-sitter-ruby.
-                .flag_if_supported("-Wno-unused-but-set-variable")
                 .link_lib_modifier("+whole-archive");
 
             for file in cpp_files {
@@ -79,26 +73,6 @@ fn main() {
             extra_files: vec![],
         },
         TreeSitterParser {
-            name: "tree-sitter-bash",
-            src_dir: "vendored_parsers/tree-sitter-bash-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-c",
-            src_dir: "vendored_parsers/tree-sitter-c-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-cpp",
-            src_dir: "vendored_parsers/tree-sitter-cpp-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-c-sharp",
-            src_dir: "vendored_parsers/tree-sitter-c-sharp-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-clojure",
             src_dir: "vendored_parsers/tree-sitter-clojure-src",
             extra_files: vec![],
@@ -112,11 +86,6 @@ fn main() {
             name: "tree-sitter-commonlisp",
             src_dir: "vendored_parsers/tree-sitter-commonlisp-src",
             extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-css",
-            src_dir: "vendored_parsers/tree-sitter-css-src",
-            extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
             name: "tree-sitter-dart",
@@ -164,11 +133,6 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
-            name: "tree-sitter-go",
-            src_dir: "vendored_parsers/tree-sitter-go-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-hack",
             src_dir: "vendored_parsers/tree-sitter-hack-src",
             extra_files: vec!["scanner.cc"],
@@ -179,43 +143,13 @@ fn main() {
             extra_files: vec![],
         },
         TreeSitterParser {
-            name: "tree-sitter-haskell",
-            src_dir: "vendored_parsers/tree-sitter-haskell-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-hcl",
             src_dir: "vendored_parsers/tree-sitter-hcl-src",
             extra_files: vec!["scanner.cc"],
         },
         TreeSitterParser {
-            name: "tree-sitter-html",
-            src_dir: "vendored_parsers/tree-sitter-html-src",
-            extra_files: vec!["scanner.cc"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-janet-simple",
             src_dir: "vendored_parsers/tree-sitter-janet-simple-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-java",
-            src_dir: "vendored_parsers/tree-sitter-java-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-javascript",
-            src_dir: "vendored_parsers/tree-sitter-javascript-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-json",
-            src_dir: "vendored_parsers/tree-sitter-json-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-julia",
-            src_dir: "vendored_parsers/tree-sitter-julia-src",
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
@@ -229,16 +163,6 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
-            name: "tree-sitter-lua",
-            src_dir: "vendored_parsers/tree-sitter-lua-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-make",
-            src_dir: "vendored_parsers/tree-sitter-make-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-newick",
             src_dir: "vendored_parsers/tree-sitter-newick-src",
             extra_files: vec![],
@@ -249,21 +173,6 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
-            name: "tree-sitter-objc",
-            src_dir: "vendored_parsers/tree-sitter-objc-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-ocaml",
-            src_dir: "vendored_parsers/tree-sitter-ocaml-src/ocaml/src",
-            extra_files: vec!["scanner.cc"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-ocaml-interface",
-            src_dir: "vendored_parsers/tree-sitter-ocaml-src/interface/src",
-            extra_files: vec!["scanner.cc"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-pascal",
             src_dir: "vendored_parsers/tree-sitter-pascal-src",
             extra_files: vec![],
@@ -271,16 +180,6 @@ fn main() {
         TreeSitterParser {
             name: "tree-sitter-perl",
             src_dir: "vendored_parsers/tree-sitter-perl-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-php",
-            src_dir: "vendored_parsers/tree-sitter-php-src",
-            extra_files: vec!["scanner.cc"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-python",
-            src_dir: "vendored_parsers/tree-sitter-python-src",
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
@@ -299,18 +198,8 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
-            name: "tree-sitter-ruby",
-            src_dir: "vendored_parsers/tree-sitter-ruby-src",
-            extra_files: vec!["scanner.cc"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-rust",
             src_dir: "vendored_parsers/tree-sitter-rust-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-scala",
-            src_dir: "vendored_parsers/tree-sitter-scala-src",
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
@@ -324,9 +213,19 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
+            name: "tree-sitter-sfapex",
+            src_dir: "vendored_parsers/tree-sitter-sfapex-src",
+            extra_files: vec![],
+        },
+        TreeSitterParser {
             name: "tree-sitter-smali",
             src_dir: "vendored_parsers/tree-sitter-smali-src",
             extra_files: vec!["scanner.c"],
+        },
+        TreeSitterParser {
+            name: "tree-sitter-solidity",
+            src_dir: "vendored_parsers/tree-sitter-solidity-src",
+            extra_files: vec![],
         },
         TreeSitterParser {
             name: "tree-sitter-sql",
@@ -334,28 +233,8 @@ fn main() {
             extra_files: vec!["scanner.cc"],
         },
         TreeSitterParser {
-            name: "tree-sitter-sfapex",
-            src_dir: "vendored_parsers/tree-sitter-sfapex-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-swift",
             src_dir: "vendored_parsers/tree-sitter-swift-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-toml",
-            src_dir: "vendored_parsers/tree-sitter-toml-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-tsx",
-            src_dir: "vendored_parsers/tree-sitter-typescript-src/tsx/src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-typescript",
-            src_dir: "vendored_parsers/tree-sitter-typescript-src/typescript/src",
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
@@ -364,23 +243,8 @@ fn main() {
             extra_files: vec![],
         },
         TreeSitterParser {
-            name: "tree-sitter-xml",
-            src_dir: "vendored_parsers/tree-sitter-xml-src/tree-sitter-xml/src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-yaml",
-            src_dir: "vendored_parsers/tree-sitter-yaml-src",
-            extra_files: vec!["scanner.cc"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-zig",
             src_dir: "vendored_parsers/tree-sitter-zig-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-solidity",
-            src_dir: "vendored_parsers/tree-sitter-solidity-src",
             extra_files: vec![],
         },
     ];

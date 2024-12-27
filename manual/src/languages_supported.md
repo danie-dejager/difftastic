@@ -36,14 +36,14 @@ with `difft --list-languages`.
 | Julia           | [tree-sitter/tree-sitter-julia](https://github.com/tree-sitter/tree-sitter-julia)               |
 | Kotlin          | [fwcd/tree-sitter-kotlin](https://github.com/fwcd/tree-sitter-kotlin)                           |
 | Lua             | [tree-sitter-grammars/tree-sitter-lua](https://github.com/tree-sitter-grammars/tree-sitter-lua) |
-| Make            | [alemuller/tree-sitter-make](https://github.com/alemuller/tree-sitter-make)                     |
+| Make            | [tree-sitter-grammars/tree-sitter-make](https://github.com/tree-sitter-grammars/tree-sitter-make)                     |
 | Nix             | [cstrahan/tree-sitter-nix](https://github.com/cstrahan/tree-sitter-nix)                         |
 | Objective-C     | [amaanq/tree-sitter-objc](https://github.com/amaanq/tree-sitter-objc)                           |
 | OCaml           | [tree-sitter/tree-sitter-ocaml](https://github.com/tree-sitter/tree-sitter-ocaml)               |
 | Perl            | [ganezdragon/tree-sitter-perl](https://github.com/ganezdragon/tree-sitter-perl)                 |
 | PHP             | [tree-sitter/tree-sitter-php](https://github.com/tree-sitter/tree-sitter-php)                   |
 | Python          | [tree-sitter/tree-sitter-python](https://github.com/tree-sitter/tree-sitter-python)             |
-| QML             | [tree-sitter/tree-sitter-qmljs](https://github.com/yuja/tree-sitter-qmljs)                      |
+| QML             | [yuja/tree-sitter-qmljs](https://github.com/yuja/tree-sitter-qmljs)                      |
 | R               | [r-lib/tree-sitter-r](https://github.com/r-lib/tree-sitter-r)                                   |
 | Racket          | [6cdh/tree-sitter-racket](https://github.com/6cdh/tree-sitter-racket)                           |
 | Ruby            | [tree-sitter/tree-sitter-ruby](https://github.com/tree-sitter/tree-sitter-ruby)                 |
@@ -60,16 +60,16 @@ with `difft --list-languages`.
 
 ## Structured Text Formats
 
-| Language | Parser Used                                                                         |
-|----------|-------------------------------------------------------------------------------------|
-| CSS      | [tree-sitter/tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css)       |
-| HCL      | [MichaHoffmann/tree-sitter-hcl](https://github.com/MichaHoffmann/tree-sitter-hcl)   |
-| HTML     | [tree-sitter/tree-sitter-html](https://github.com/tree-sitter/tree-sitter-html)     |
-| JSON     | [tree-sitter/tree-sitter-json](https://github.com/tree-sitter/tree-sitter-json)     |
-| LaTeX    | [latex-lsp/tree-sitter-latex](https://github.com/latex-lsp/tree-sitter-latex)       |
-| Newick   | [delehef/tree-sitter-newick](https://github.com/delehef/tree-sitter-newick)         |
-| SCSS     | [serenadeai/tree-sitter-scss](https://github.com/serenadeai/tree-sitter-scss)       |
-| TOML     | [ikatyang/tree-sitter-toml](https://github.com/ikatyang/tree-sitter-toml)           |
-| XML      | [ObserverOfTime/tree-sitter-xml](https://github.com/ObserverOfTime/tree-sitter-xml) |
-| YAML     | [ikatyang/tree-sitter-yaml](https://github.com/ikatyang/tree-sitter-yaml)           |
+| Language | Parser Used                                                                                       |
+|----------|---------------------------------------------------------------------------------------------------|
+| CSS      | [tree-sitter/tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css)                     |
+| HCL      | [MichaHoffmann/tree-sitter-hcl](https://github.com/MichaHoffmann/tree-sitter-hcl)                 |
+| HTML     | [tree-sitter/tree-sitter-html](https://github.com/tree-sitter/tree-sitter-html)                   |
+| JSON     | [tree-sitter/tree-sitter-json](https://github.com/tree-sitter/tree-sitter-json)                   |
+| LaTeX    | [latex-lsp/tree-sitter-latex](https://github.com/latex-lsp/tree-sitter-latex)                     |
+| Newick   | [delehef/tree-sitter-newick](https://github.com/delehef/tree-sitter-newick)                       |
+| SCSS     | [serenadeai/tree-sitter-scss](https://github.com/serenadeai/tree-sitter-scss)                     |
+| TOML     | [tree-sitter-grammars/tree-sitter-toml](https://github.com/tree-sitter-grammars/tree-sitter-toml) |
+| XML      | [tree-sitter-grammars/tree-sitter-xml](https://github.com/tree-sitter-grammars/tree-sitter-xml)   |
+| YAML     | [tree-sitter-grammars/tree-sitter-yaml](https://github.com/tree-sitter-grammars/tree-sitter-yaml) |
 
