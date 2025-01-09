@@ -8,7 +8,6 @@ use std::{
 };
 
 use clap::{crate_authors, crate_description, value_parser, Arg, ArgAction, Command};
-use const_format::formatcp;
 use crossterm::tty::IsTty;
 use itertools::Itertools;
 
@@ -91,7 +90,7 @@ impl Default for DiffOptions {
     }
 }
 
-fn app() -> clap::Command<'static> {
+fn app() -> clap::Command {
     Command::new("Difftastic")
         .override_usage(USAGE)
         .version(env!("CARGO_PKG_VERSION"))
@@ -117,7 +116,6 @@ fn app() -> clap::Command<'static> {
         .arg(
             Arg::new("dump-syntax")
                 .long("dump-syntax")
-                .takes_value(true)
                 .value_name("PATH")
                 .action(ArgAction::Set)
                 .long_help(
@@ -127,7 +125,6 @@ fn app() -> clap::Command<'static> {
         .arg(
             Arg::new("dump-syntax-dot")
                 .long("dump-syntax-dot")
-                .takes_value(true)
                 .value_name("PATH")
                 .action(ArgAction::Set)
                 .long_help(
@@ -137,8 +134,7 @@ fn app() -> clap::Command<'static> {
         .arg(
             Arg::new("dump-ts")
                 .long("dump-ts")
-                .takes_value(true)
-                .value_name("PATH")
+                                .value_name("PATH")
                 .action(ArgAction::Set)
                 .long_help(
                     "Parse a single file with tree-sitter and display the tree-sitter parse tree.",
@@ -147,36 +143,33 @@ fn app() -> clap::Command<'static> {
         .arg(
             Arg::new("context")
                 .long("context")
-                .takes_value(true)
-                .value_name("LINES")
+                                .value_name("LINES")
                 .action(ArgAction::Set)
                 .long_help("The number of contextual lines to show around changed lines.")
                 .default_value("3")
                 .env("DFT_CONTEXT")
-                .validator(|s| s.parse::<u32>())
+                .value_parser(clap::value_parser!(u32))
                 .required(false),
         )
         .arg(
             Arg::new("width")
                 .long("width")
-                .takes_value(true)
                 .value_name("COLUMNS")
                 .action(ArgAction::Set)
                 .long_help("Use this many columns when calculating line wrapping. If not specified, difftastic will detect the terminal width.")
                 .env("DFT_WIDTH")
-                .validator(|s| s.parse::<usize>())
+                .value_parser(clap::value_parser!(usize))
                 .required(false),
         )
         .arg(
             Arg::new("tab-width")
                 .long("tab-width")
-                .takes_value(true)
                 .value_name("NUM_SPACES")
                 .action(ArgAction::Set)
                 .long_help("Treat a tab as this many spaces.")
                 .env("DFT_TAB_WIDTH")
-                .default_value(formatcp!("{}", DEFAULT_TAB_WIDTH))
-                .validator(|s| s.parse::<usize>())
+                .default_value(format!("{}", DEFAULT_TAB_WIDTH))
+                .value_parser(clap::value_parser!(usize))
                 .required(false),
         )
         .arg(
@@ -290,42 +283,38 @@ When multiple overrides are specified, the first matching override wins."))
         )
         .arg(
             Arg::new("byte-limit").long("byte-limit")
-                .takes_value(true)
                 .value_name("LIMIT")
                 .action(ArgAction::Set)
                 .help("Use a text diff if either input file exceeds this size.")
-                .default_value(formatcp!("{}", DEFAULT_BYTE_LIMIT))
+                .default_value(format!("{}", DEFAULT_BYTE_LIMIT))
                 .env("DFT_BYTE_LIMIT")
-                .validator(|s| s.parse::<usize>())
+                .value_parser(clap::value_parser!(usize))
                 .required(false),
         )
         .arg(
             Arg::new("graph-limit").long("graph-limit")
-                .takes_value(true)
                 .value_name("LIMIT")
                 .help("Use a text diff if the structural graph exceed this number of nodes in memory.")
-                .default_value(formatcp!("{}", DEFAULT_GRAPH_LIMIT))
+                .default_value(format!("{}", DEFAULT_GRAPH_LIMIT))
                 .action(ArgAction::Set)
                 .env("DFT_GRAPH_LIMIT")
-                .validator(|s| s.parse::<usize>())
+                .value_parser(clap::value_parser!(usize))
                 .required(false),
         )
         .arg(
             Arg::new("parse-error-limit").long("parse-error-limit")
-                .takes_value(true)
                 .value_name("LIMIT")
                 .action(ArgAction::Set)
                 .help("Use a text diff if the number of parse errors exceeds this value.")
-                .default_value(formatcp!("{}", DEFAULT_PARSE_ERROR_LIMIT))
+                .default_value(format!("{}", DEFAULT_PARSE_ERROR_LIMIT))
                 .env("DFT_PARSE_ERROR_LIMIT")
-                .validator(|s| s.parse::<usize>())
+                .value_parser(clap::value_parser!(usize))
                 .required(false),
         )
         .arg(
             Arg::new("paths")
                 .value_name("PATHS")
                 .action(ArgAction::Append)
-                .multiple_values(true)
                 .hide(true)
                 .value_parser(value_parser!(OsString)),
         )
@@ -646,7 +635,11 @@ fn parse_overrides_or_die(raw_overrides: &[String]) -> Vec<(LanguageOverride, Ve
 pub(crate) fn parse_args() -> Mode {
     let matches = app().get_matches();
 
-    let color_output = match matches.value_of("color").expect("color has a default") {
+    let color_output = match matches
+        .get_one::<String>("color")
+        .map(|s| s.as_str())
+        .expect("color has a default")
+    {
         "always" => ColorOutput::Always,
         "never" => ColorOutput::Never,
         "auto" => ColorOutput::Auto,
@@ -659,8 +652,8 @@ pub(crate) fn parse_args() -> Mode {
     let ignore_comments = matches.get_flag("ignore-comments");
 
     let mut raw_overrides: Vec<String> = vec![];
-    if let Some(overrides) = matches.values_of("override") {
-        raw_overrides = overrides.map(|s| s.into()).collect();
+    if let Some(overrides) = matches.get_many("override") {
+        raw_overrides = overrides.cloned().collect();
     }
     for i in 1..=9 {
         if let Ok(value) = env::var(format!("DFT_OVERRIDE_{}", i)) {
@@ -677,7 +670,7 @@ pub(crate) fn parse_args() -> Mode {
         };
     }
 
-    if let Some(path) = matches.value_of("dump-syntax") {
+    if let Some(path) = matches.get_one::<String>("dump-syntax") {
         return Mode::DumpSyntax {
             path: path.to_owned(),
             ignore_comments,
@@ -685,7 +678,7 @@ pub(crate) fn parse_args() -> Mode {
         };
     }
 
-    if let Some(path) = matches.value_of("dump-syntax-dot") {
+    if let Some(path) = matches.get_one::<String>("dump-syntax-dot") {
         return Mode::DumpSyntaxDot {
             path: path.to_owned(),
             ignore_comments,
@@ -693,22 +686,24 @@ pub(crate) fn parse_args() -> Mode {
         };
     }
 
-    if let Some(path) = matches.value_of("dump-ts") {
+    if let Some(path) = matches.get_one::<String>("dump-ts") {
         return Mode::DumpTreeSitter {
             path: path.to_owned(),
             language_overrides,
         };
     }
 
-    let terminal_width = if let Some(arg_width) = matches.value_of("width") {
-        arg_width
-            .parse::<usize>()
-            .expect("Already validated by clap")
+    let terminal_width = if let Some(arg_width) = matches.get_one::<usize>("width") {
+        *arg_width
     } else {
         detect_terminal_width()
     };
 
-    let display_mode = match matches.value_of("display").expect("display has a default") {
+    let display_mode = match matches
+        .get_one::<String>("display")
+        .map(|s| s.as_str())
+        .expect("display has a default")
+    {
         "side-by-side" => DisplayMode::SideBySide,
         "side-by-side-show-both" => DisplayMode::SideBySideShowBoth,
         "inline" => DisplayMode::Inline,
@@ -726,7 +721,8 @@ pub(crate) fn parse_args() -> Mode {
     };
 
     let background_color = match matches
-        .value_of("background")
+        .get_one::<String>("background")
+        .map(|s| s.as_str())
         .expect("Always present as we've given clap a default")
     {
         "dark" => BackgroundColor::Dark,
@@ -734,45 +730,38 @@ pub(crate) fn parse_args() -> Mode {
         _ => unreachable!("clap has already validated the values"),
     };
 
-    let syntax_highlight = matches.value_of("syntax-highlight") == Some("on");
+    let syntax_highlight = matches
+        .get_one::<String>("syntax-highlight")
+        .map(|s| s.as_str())
+        == Some("on");
 
     let sort_paths = matches.get_flag("sort-paths");
 
-    let graph_limit = matches
-        .value_of("graph-limit")
-        .expect("Always present as we've given clap a default")
-        .parse::<usize>()
-        .expect("Value already validated by clap");
+    let graph_limit = *matches
+        .get_one("graph-limit")
+        .expect("Always present as we've given clap a default");
 
-    let byte_limit = matches
-        .value_of("byte-limit")
-        .expect("Always present as we've given clap a default")
-        .parse::<usize>()
-        .expect("Value already validated by clap");
+    let byte_limit = *matches
+        .get_one("byte-limit")
+        .expect("Always present as we've given clap a default");
 
-    let parse_error_limit = matches
-        .value_of("parse-error-limit")
-        .expect("Always present as we've given clap a default")
-        .parse::<usize>()
-        .expect("Value already validated by clap");
+    let parse_error_limit = *matches
+        .get_one("parse-error-limit")
+        .expect("Always present as we've given clap a default");
 
-    let tab_width = matches
-        .value_of("tab-width")
-        .expect("Always present as we've given clap a default")
-        .parse::<usize>()
-        .expect("Value already validated by clap");
+    let tab_width = *matches
+        .get_one("tab-width")
+        .expect("Always present as we've given clap a default");
 
-    let num_context_lines = matches
-        .value_of("context")
-        .expect("Always present as we've given clap a default")
-        .parse::<u32>()
-        .expect("Value already validated by clap");
+    let num_context_lines = *matches
+        .get_one("context")
+        .expect("Always present as we've given clap a default");
 
     let print_unchanged = !matches.get_flag("skip-unchanged");
 
     let set_exit_code = matches.get_flag("exit-code");
 
-    let strip_cr = matches.value_of("strip-cr") == Some("on");
+    let strip_cr = matches.get_one::<String>("strip-cr").map(|s| s.as_str()) == Some("on");
 
     let check_only = matches.get_flag("check-only");
 
@@ -785,7 +774,10 @@ pub(crate) fn parse_args() -> Mode {
         strip_cr,
     };
 
-    let args: Vec<_> = matches.values_of_os("paths").unwrap_or_default().collect();
+    let args = matches
+        .get_raw("paths")
+        .unwrap_or_default()
+        .collect::<Vec<_>>();
     info!("CLI arguments: {:?}", args);
 
     // Print git environment variables so we can see the additional

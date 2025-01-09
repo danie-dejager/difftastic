@@ -35,7 +35,7 @@ pkg-fmt = "zip"
 
 [dependencies]
 regex = "1.10.4"
-clap = { version = "3.2.25", features = ["cargo", "env", "wrap_help"] }
+clap = { version = "4.0.0", features = ["cargo", "env", "wrap_help", "string"] }
 itertools = "0.11.0"
 typed-arena = "2.0.2"
 rustc-hash = "2.0.0"
@@ -54,8 +54,7 @@ radix-heap = "0.4.2"
 # ignore does not declare a MSRV, but it's part of ripgrep, which has
 # a slightly more aggressive MSRV than difftastic. Constrain ignore to
 # a known-good max version.
-ignore = ">= 0.4, < 0.4.22"
-const_format = "0.2.22"
+ignore = ">= 0.4, < 0.4.24"
 owo-colors = "3.5.0"
 wu-diff = "0.1.2"
 rayon = "1.7.0"
@@ -63,7 +62,7 @@ tree_magic_mini = "3.1.5"
 
 bumpalo = "3.16.0"
 unicode-width = "0.1.9"
-crossterm = { version = "0.27.0", features = ["windows"] }
+crossterm = { version = "0.28.0", features = ["windows"] }
 glob = "0.3.1"
 strum = { version = "0.26", features = ["derive"] }
 hashbrown = "0.14.0"
@@ -98,6 +97,7 @@ tree-sitter-lua = "0.2.0"
 tree-sitter-xml = "0.7.0"
 tree-sitter-make = "1.1.1"
 tree-sitter-yaml = "0.7.0"
+encoding_rs = "0.8.35"
 
 [dev-dependencies]
 # assert_cmd 2.0.10 requires predicates 3.
