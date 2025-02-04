@@ -8,9 +8,9 @@ use std::{
 };
 
 use ignore::WalkBuilder;
-use rustc_hash::FxHashSet;
 
 use crate::exit_codes::EXIT_BAD_ARGUMENTS;
+use crate::hash::DftHashSet;
 use crate::options::FileArgument;
 
 pub(crate) fn read_file_or_die(path: &FileArgument) -> Vec<u8> {
@@ -227,7 +227,14 @@ pub(crate) fn guess_content(bytes: &[u8]) -> ProbableFileKind {
     // ISO-8859-1 aka Latin 1), treat them as such.
     let (latin1_str, _encoding, saw_malformed) = encoding_rs::WINDOWS_1252.decode(bytes);
     if !saw_malformed {
-        return ProbableFileKind::Text(latin1_str.to_string());
+        let num_null = utf16_string
+            .chars()
+            .take(5000)
+            .filter(|c| *c == '\0')
+            .count();
+        if num_null <= 1 {
+            return ProbableFileKind::Text(latin1_str.to_string());
+        }
     }
 
     ProbableFileKind::Binary
@@ -235,9 +242,17 @@ pub(crate) fn guess_content(bytes: &[u8]) -> ProbableFileKind {
 
 /// All the files in `dir`, including subdirectories.
 fn relative_file_paths_in_dir(dir: &Path) -> Vec<PathBuf> {
-    WalkBuilder::new(dir)
+    // Walk all the files in `dir`, excluding those mentioned in .git.
+    let walker = WalkBuilder::new(dir)
+        // Include files whose name starts with a dot.
         .hidden(false)
-        .build()
+        // Exclude the .git directory.
+        .filter_entry(|e| {
+            !(e.file_type().map(|ft| ft.is_dir()).unwrap_or(false) && e.file_name() == ".git")
+        })
+        .build();
+
+    walker
         .filter_map(Result::ok)
         .map(|entry| Path::new(entry.path()).to_owned())
         .filter(|path| !path.is_dir())
@@ -253,7 +268,7 @@ pub(crate) fn relative_paths_in_either(lhs_dir: &Path, rhs_dir: &Path) -> Vec<Pa
     let lhs_paths = relative_file_paths_in_dir(lhs_dir);
     let rhs_paths = relative_file_paths_in_dir(rhs_dir);
 
-    let mut seen = FxHashSet::default();
+    let mut seen = DftHashSet::default();
     let mut paths: Vec<PathBuf> = vec![];
 
     let mut i = 0;

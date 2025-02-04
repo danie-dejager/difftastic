@@ -1,11 +1,25 @@
 ## 0.63 (unreleased)
 
+### Diffing
+
+When diffing directories, difftastic now ignores the `.git` directory.
+
+### Command Line Interface
+
+Difftastic no longer accepts the `--missing-as-empty`. This has had no
+effect since 0.46.
+
 ### Parsing
 
 File detection now supports Windows-1252 encoded test (an extension of
 ISO-8859-1), and is stricter about UTF-16 detection.
 
-Updated to the latest tree-sitter parser for Make and YAML.
+Updated to the latest tree-sitter parser for LaTeX, Make, Rust and
+YAML.
+
+### Build
+
+Releases now include prebuilt musl binaries.
 
 ## 0.62 (released 20th December 2024)
 
