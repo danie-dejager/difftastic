@@ -4,18 +4,23 @@
 
 When diffing directories, difftastic now ignores the `.git` directory.
 
+### Display
+
+Fixed an issue where `--display=side-by-side-show-both` would not use
+a two-column display when one file was empty.
+
 ### Command Line Interface
 
-Difftastic no longer accepts the `--missing-as-empty`. This has had no
-effect since 0.46.
+Difftastic no longer accepts the `--missing-as-empty` argument. This
+argument has had no effect since 0.46.
 
 ### Parsing
 
-File detection now supports Windows-1252 encoded test (an extension of
+File detection now supports Windows-1252 encoded text (an extension of
 ISO-8859-1), and is stricter about UTF-16 detection.
 
-Updated to the latest tree-sitter parser for LaTeX, Make, Rust and
-YAML.
+Updated to the latest tree-sitter parser for Elixir, LaTeX, Make, Nix,
+Rust and YAML.
 
 ### Build
 

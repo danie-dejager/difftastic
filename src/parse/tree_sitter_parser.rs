@@ -67,7 +67,6 @@ extern "C" {
     fn tree_sitter_dart() -> ts::Language;
     fn tree_sitter_devicetree() -> ts::Language;
     fn tree_sitter_elisp() -> ts::Language;
-    fn tree_sitter_elixir() -> ts::Language;
     fn tree_sitter_elm() -> ts::Language;
     fn tree_sitter_elvish() -> ts::Language;
     fn tree_sitter_erlang() -> ts::Language;
@@ -80,7 +79,6 @@ extern "C" {
     fn tree_sitter_kotlin() -> ts::Language;
     fn tree_sitter_latex() -> ts::Language;
     fn tree_sitter_newick() -> ts::Language;
-    fn tree_sitter_nix() -> ts::Language;
     fn tree_sitter_pascal() -> ts::Language;
     fn tree_sitter_perl() -> ts::Language;
     fn tree_sitter_qmljs() -> ts::Language;
@@ -304,35 +302,18 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
                 sub_languages: vec![],
             }
         }
-        EmacsLisp => {
-            let language = unsafe { tree_sitter_elisp() };
-            TreeSitterConfig {
-                language: language.clone(),
-                atom_nodes: [].into_iter().collect(),
-                delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]")]
-                    .into_iter()
-                    .collect(),
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/elisp.scm"),
-                )
-                .unwrap(),
-                sub_languages: vec![],
-            }
-        }
         Elixir => {
-            let language = unsafe { tree_sitter_elixir() };
+            let language_fn = tree_sitter_elixir::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
-                atom_nodes: ["string", "heredoc"].into_iter().collect(),
+                atom_nodes: vec!["string", "sigil", "heredoc"].into_iter().collect(),
                 delimiter_tokens: vec![("(", ")"), ("{", "}"), ("do", "end")]
                     .into_iter()
                     .collect(),
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/elixir.scm"),
-                )
-                .unwrap(),
+                highlight_query: ts::Query::new(&language, tree_sitter_elixir::HIGHLIGHTS_QUERY)
+                    .unwrap(),
                 sub_languages: vec![],
             }
         }
@@ -359,6 +340,22 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
                 highlight_query: ts::Query::new(
                     &language,
                     include_str!("../../vendored_parsers/highlights/elvish.scm"),
+                )
+                .unwrap(),
+                sub_languages: vec![],
+            }
+        }
+        EmacsLisp => {
+            let language = unsafe { tree_sitter_elisp() };
+            TreeSitterConfig {
+                language: language.clone(),
+                atom_nodes: [].into_iter().collect(),
+                delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]")]
+                    .into_iter()
+                    .collect(),
+                highlight_query: ts::Query::new(
+                    &language,
+                    include_str!("../../vendored_parsers/highlights/elisp.scm"),
                 )
                 .unwrap(),
                 sub_languages: vec![],
@@ -718,18 +715,17 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Nix => {
-            let language = unsafe { tree_sitter_nix() };
+            let language_fn = tree_sitter_nix::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: ["string_expression", "indented_string_expression"]
                     .into_iter()
                     .collect(),
                 delimiter_tokens: vec![("{", "}"), ("[", "]")].into_iter().collect(),
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/nix.scm"),
-                )
-                .unwrap(),
+                highlight_query: ts::Query::new(&language, tree_sitter_nix::HIGHLIGHTS_QUERY)
+                    .unwrap(),
                 sub_languages: vec![],
             }
         }
