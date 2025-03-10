@@ -14,7 +14,7 @@ use crate::words::split_words_and_numbers;
 use crate::{
     diff::changes::ChangeKind,
     diff::changes::{ChangeKind::*, ChangeMap},
-    diff::myers_diff,
+    diff::lcs_diff,
     hash::DftHashMap,
     lines::is_all_whitespace,
 };
@@ -249,13 +249,13 @@ impl<'a> Syntax<'a> {
     pub(crate) fn new_atom(
         arena: &'a Arena<Syntax<'a>>,
         mut position: Vec<SingleLineSpan>,
-        mut content: &str,
+        mut content: String,
         kind: AtomKind,
     ) -> &'a Syntax<'a> {
         // If a parser hasn't cleaned up \r on CRLF files with
         // comments, discard it.
         if content.ends_with('\r') {
-            content = &content[..content.len() - 1];
+            content.pop();
         }
 
         // If a parser adds a trailing newline to the atom, discard
@@ -264,13 +264,13 @@ impl<'a> Syntax<'a> {
         // the end of the file.
         if content.ends_with('\n') {
             position.pop();
-            content = &content[..content.len() - 1];
+            content.pop();
         }
 
         arena.alloc(Atom {
             info: SyntaxInfo::default(),
             position,
-            content: content.into(),
+            content,
             kind,
         })
     }
@@ -708,7 +708,7 @@ fn split_atom_words(
     let content_parts = split_words_and_numbers(content);
     let other_parts = split_words_and_numbers(opposite_content);
 
-    let word_diffs = myers_diff::slice_by_hash(&content_parts, &other_parts);
+    let word_diffs = lcs_diff::slice_by_hash(&content_parts, &other_parts);
 
     if !has_common_words(&word_diffs) {
         return pos
@@ -731,7 +731,7 @@ fn split_atom_words(
     let mut mps = vec![];
     for diff_res in word_diffs {
         match diff_res {
-            myers_diff::DiffResult::Left(word) => {
+            lcs_diff::DiffResult::Left(word) => {
                 // This word is novel to this side.
                 if !is_all_whitespace(word) {
                     mps.push(MatchedPos {
@@ -748,7 +748,7 @@ fn split_atom_words(
                 }
                 offset += word.len();
             }
-            myers_diff::DiffResult::Both(word, opposite_word) => {
+            lcs_diff::DiffResult::Both(word, opposite_word) => {
                 // This word is present on both sides.
                 // TODO: don't assume this atom is on a single line.
                 let word_pos =
@@ -771,7 +771,7 @@ fn split_atom_words(
                 offset += word.len();
                 opposite_offset += opposite_word.len();
             }
-            myers_diff::DiffResult::Right(opposite_word) => {
+            lcs_diff::DiffResult::Right(opposite_word) => {
                 // Only exists on other side, nothing to do on this side.
                 opposite_offset += opposite_word.len();
             }
@@ -783,13 +783,13 @@ fn split_atom_words(
 
 /// Are there sufficient common words that we should only highlight
 /// individual changed words?
-fn has_common_words(word_diffs: &Vec<myers_diff::DiffResult<&&str>>) -> bool {
+fn has_common_words(word_diffs: &Vec<lcs_diff::DiffResult<&&str>>) -> bool {
     let mut novel_count = 0;
     let mut unchanged_count = 0;
 
     for word_diff in word_diffs {
         match word_diff {
-            myers_diff::DiffResult::Both(word, _) => {
+            lcs_diff::DiffResult::Both(word, _) => {
                 if **word != " " {
                     unchanged_count += 1;
                 }
@@ -1084,8 +1084,8 @@ mod tests {
 
         let arena = Arena::new();
 
-        let comment = Syntax::new_atom(&arena, pos.clone(), "foo", AtomKind::Comment);
-        let atom = Syntax::new_atom(&arena, pos, "foo", AtomKind::Normal);
+        let comment = Syntax::new_atom(&arena, pos.clone(), "foo".to_owned(), AtomKind::Comment);
+        let atom = Syntax::new_atom(&arena, pos, "foo".to_owned(), AtomKind::Normal);
         init_all_info(&[comment], &[atom]);
 
         assert_ne!(comment, atom);
@@ -1097,7 +1097,7 @@ mod tests {
         let position = vec![];
         let content = "foo\r";
 
-        let atom = Syntax::new_atom(&arena, position, content, AtomKind::Comment);
+        let atom = Syntax::new_atom(&arena, position, content.to_owned(), AtomKind::Comment);
 
         match atom {
             List { .. } => unreachable!(),
@@ -1124,7 +1124,7 @@ mod tests {
         ];
         let content = ";; hello\n";
 
-        let atom = Syntax::new_atom(&arena, position, content, AtomKind::Comment);
+        let atom = Syntax::new_atom(&arena, position, content.to_owned(), AtomKind::Comment);
 
         match atom {
             List { .. } => unreachable!(),
@@ -1157,8 +1157,8 @@ mod tests {
 
         let arena = Arena::new();
 
-        let type_atom = Syntax::new_atom(&arena, pos.clone(), "foo", AtomKind::Type);
-        let atom = Syntax::new_atom(&arena, pos, "foo", AtomKind::Normal);
+        let type_atom = Syntax::new_atom(&arena, pos.clone(), "foo".to_owned(), AtomKind::Type);
+        let atom = Syntax::new_atom(&arena, pos, "foo".to_owned(), AtomKind::Normal);
         init_all_info(&[type_atom], &[atom]);
 
         assert_eq!(type_atom, atom);
@@ -1173,7 +1173,7 @@ mod tests {
         }];
 
         let arena = Arena::new();
-        let atom = Syntax::new_atom(&arena, pos, "foo", AtomKind::Normal);
+        let atom = Syntax::new_atom(&arena, pos, "foo".to_owned(), AtomKind::Normal);
 
         let trivial_list = Syntax::new_list(&arena, "", vec![], vec![atom], "", vec![]);
 
@@ -1189,7 +1189,7 @@ mod tests {
         }];
 
         let arena = Arena::new();
-        let atom = Syntax::new_atom(&arena, pos, "", AtomKind::Normal);
+        let atom = Syntax::new_atom(&arena, pos, "".to_owned(), AtomKind::Normal);
 
         let trivial_list = Syntax::new_list(&arena, "(", vec![], vec![atom], ")", vec![]);
 
@@ -1211,8 +1211,13 @@ mod tests {
 
         let arena = Arena::new();
 
-        let x = Syntax::new_atom(&arena, pos.clone(), "foo\nbar", AtomKind::Comment);
-        let y = Syntax::new_atom(&arena, pos, "foo\n    bar", AtomKind::Comment);
+        let x = Syntax::new_atom(
+            &arena,
+            pos.clone(),
+            "foo\nbar".to_owned(),
+            AtomKind::Comment,
+        );
+        let y = Syntax::new_atom(&arena, pos, "foo\n    bar".to_owned(), AtomKind::Comment);
         init_all_info(&[x], &[y]);
 
         assert_eq!(x, y);

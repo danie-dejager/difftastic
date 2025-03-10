@@ -69,8 +69,6 @@ extern "C" {
     fn tree_sitter_elisp() -> ts::Language;
     fn tree_sitter_elm() -> ts::Language;
     fn tree_sitter_elvish() -> ts::Language;
-    fn tree_sitter_erlang() -> ts::Language;
-    fn tree_sitter_fsharp() -> ts::Language;
     fn tree_sitter_gleam() -> ts::Language;
     fn tree_sitter_hare() -> ts::Language;
     fn tree_sitter_hack() -> ts::Language;
@@ -79,7 +77,6 @@ extern "C" {
     fn tree_sitter_kotlin() -> ts::Language;
     fn tree_sitter_latex() -> ts::Language;
     fn tree_sitter_newick() -> ts::Language;
-    fn tree_sitter_pascal() -> ts::Language;
     fn tree_sitter_perl() -> ts::Language;
     fn tree_sitter_qmljs() -> ts::Language;
     fn tree_sitter_r() -> ts::Language;
@@ -89,7 +86,6 @@ extern "C" {
     fn tree_sitter_scss() -> ts::Language;
     fn tree_sitter_solidity() -> ts::Language;
     fn tree_sitter_sql() -> ts::Language;
-    fn tree_sitter_swift() -> ts::Language;
     fn tree_sitter_vhdl() -> ts::Language;
     fn tree_sitter_zig() -> ts::Language;
 }
@@ -362,7 +358,9 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Erlang => {
-            let language = unsafe { tree_sitter_erlang() };
+            let language_fn = tree_sitter_erlang::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: [].into_iter().collect(),
@@ -376,16 +374,16 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         FSharp => {
-            let language = unsafe { tree_sitter_fsharp() };
+            let language_fn = tree_sitter_fsharp::LANGUAGE_FSHARP;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: ["string", "triple_quoted_string"].into_iter().collect(),
                 delimiter_tokens: vec![("(", ")"), ("[", "]"), ("{", "}")],
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/f-sharp.scm"),
-                )
-                .unwrap(),
+                highlight_query: ts::Query::new(&language, tree_sitter_fsharp::HIGHLIGHTS_QUERY)
+                    .unwrap(),
+
                 sub_languages: vec![],
             }
         }
@@ -773,7 +771,9 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Pascal => {
-            let language = unsafe { tree_sitter_pascal() };
+            let language_fn = tree_sitter_pascal::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: [].into_iter().collect(),
@@ -1001,16 +1001,15 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Swift => {
-            let language = unsafe { tree_sitter_swift() };
+            let language_fn = tree_sitter_swift::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: ["line_string_literal"].into_iter().collect(),
                 delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]"), ("<", ">")],
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/swift.scm"),
-                )
-                .unwrap(),
+                highlight_query: ts::Query::new(&language, tree_sitter_swift::HIGHLIGHTS_QUERY)
+                    .unwrap(),
                 sub_languages: vec![],
             }
         }
@@ -1797,7 +1796,12 @@ fn atom_from_cursor<'a>(
         AtomKind::Normal
     };
 
-    Some(Syntax::new_atom(arena, position, content, highlight))
+    Some(Syntax::new_atom(
+        arena,
+        position,
+        content.to_owned(),
+        highlight,
+    ))
 }
 
 #[cfg(test)]
