@@ -28,6 +28,10 @@
 //! This module fixes these cases. It identifies situations where we
 //! can change which item is marked as novel (e.g. either `B` in the
 //! example above) whilst still showing a valid, minimal diff.
+//!
+//! A similar problem exists with line-based textual diffs, see
+//! [diff-slider-tools](https://github.com/mhagger/diff-slider-tools)
+//! for a thorough discussion.
 
 use line_numbers::SingleLineSpan;
 
@@ -49,7 +53,7 @@ pub(crate) fn fix_all_sliders<'a>(
     fix_all_nested_sliders(language, nodes, change_map);
 }
 
-/// Should nester slider correction prefer the inner or outer
+/// Should nested slider correction prefer the inner or outer
 /// delimiter?
 fn prefer_outer_delimiter(language: guess_language::Language) -> bool {
     use crate::parse::guess_language::Language::*;
@@ -621,7 +625,7 @@ fn distance_between(prev: &Syntax, next: &Syntax) -> (u32, u32) {
     (0, 0)
 }
 
-impl<'a> Syntax<'a> {
+impl Syntax<'_> {
     fn first_line_span(&self) -> Option<SingleLineSpan> {
         match self {
             List {
