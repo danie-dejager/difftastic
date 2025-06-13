@@ -104,7 +104,7 @@ sample_files/html_simple_1.html sample_files/html_simple_2.html
 bb129dce38cd26eac81ca52d2016bade  -
 
 sample_files/huge_cpp_1.cpp sample_files/huge_cpp_2.cpp
-47e26aa5975cd57344ccbf9f366466ec  -
+d41d8cd98f00b204e9800998ecf8427e  -
 
 sample_files/identical_1.scala sample_files/identical_2.scala
 15c5a789e644348cb7e0de051ff4b63e  -
@@ -294,6 +294,9 @@ sample_files/typing_1.ml sample_files/typing_2.ml
 
 sample_files/utf16_1.py sample_files/utf16_2.py
 3bcee785d4cebc38a42eafe49a198b52  -
+
+sample_files/verilog_1.sv sample_files/verilog_2.sv
+2f59632b5a4e5addfa7b4d5274da72cc  -
 
 sample_files/vhdl_1.vhd sample_files/vhdl_2.vhd
 ca98b4d14fc21e0f04cf24aeb3d2526c  -
