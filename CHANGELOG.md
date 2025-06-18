@@ -1,9 +1,11 @@
-## 0.64 (unreleased)
+## 0.65 (unreleased)
+
+## 0.64 (released 16th June 2025)
 
 ### Parsing
 
-Updated to the latest tree-sitter parser for Erlang, F#, Pascal and
-Swift.
+Updated to the latest tree-sitter parser for Erlang, F#, Gleam, Pascal
+and Swift.
 
 File detection is now stricter for UTF-8, and recognises more
 compression file types as binary (e.g. zstd or bzip2).
@@ -13,7 +15,15 @@ Added support for Verilog and SystemVerilog.
 ### Build
 
 CI on GitHub now uses Ubuntu 22.04 for Linux builds (previously Ubuntu
-20.04), so prebuilt binaries will require a newer glibc version to run.
+20.04), so prebuilt binaries will require a newer glibc version to
+run.
+
+### Internal
+
+Difftastic has switched from MiMalloc to Jemalloc for allocation. This
+is modest performance regression (up to 20% longer runtime in
+testing). Jemalloc is currently easier to build (see issue #805) and
+has fewer pathological performance corner cases.
 
 ## 0.63 (released 11th February 2025)
 
