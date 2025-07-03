@@ -22,6 +22,8 @@
 // It's sometimes more readable to explicitly create a vec than to use
 // the Default trait.
 #![allow(clippy::manual_unwrap_or_default)]
+// I find the explicit arithmetic clearer sometimes.
+#![allow(clippy::implicit_saturating_sub)]
 // .to_owned() is more explicit on string references.
 #![warn(clippy::str_to_string)]
 // .to_string() on a String is clearer as .clone().
@@ -239,6 +241,7 @@ fn main() {
             display_options,
             set_exit_code,
             language_overrides,
+            binary_overrides,
         } => {
             let diff_result = diff_conflicts_file(
                 &display_path,
@@ -246,6 +249,7 @@ fn main() {
                 &display_options,
                 &diff_options,
                 &language_overrides,
+                &binary_overrides,
             );
 
             print_diff_result(&display_options, &diff_result);
@@ -262,6 +266,7 @@ fn main() {
             display_options,
             set_exit_code,
             language_overrides,
+            binary_overrides,
             lhs_path,
             rhs_path,
             lhs_permissions,
@@ -297,6 +302,7 @@ fn main() {
                         &display_options,
                         &diff_options,
                         &language_overrides,
+                        &binary_overrides,
                     );
 
                     if matches!(display_options.display_mode, DisplayMode::Json) {
@@ -351,6 +357,7 @@ fn main() {
                         &diff_options,
                         false,
                         &language_overrides,
+                        &binary_overrides,
                     );
                     if diff_result.has_reportable_change() {
                         encountered_changes = true;
@@ -389,9 +396,16 @@ fn diff_file(
     diff_options: &DiffOptions,
     missing_as_empty: bool,
     overrides: &[(LanguageOverride, Vec<glob::Pattern>)],
+    binary_overrides: &[glob::Pattern],
 ) -> DiffResult {
     let (lhs_bytes, rhs_bytes) = read_files_or_die(lhs_path, rhs_path, missing_as_empty);
-    let (mut lhs_src, mut rhs_src) = match (guess_content(&lhs_bytes), guess_content(&rhs_bytes)) {
+
+    // Override here? Separate option or part of existing --override arg?
+
+    let (mut lhs_src, mut rhs_src) = match (
+        guess_content(&lhs_bytes, &lhs_path, binary_overrides),
+        guess_content(&rhs_bytes, &rhs_path, binary_overrides),
+    ) {
         (ProbableFileKind::Binary, _) | (_, ProbableFileKind::Binary) => {
             return DiffResult {
                 extra_info: renamed,
@@ -467,9 +481,10 @@ fn diff_conflicts_file(
     display_options: &DisplayOptions,
     diff_options: &DiffOptions,
     overrides: &[(LanguageOverride, Vec<glob::Pattern>)],
+    binary_overrides: &[glob::Pattern],
 ) -> DiffResult {
     let bytes = read_file_or_die(path);
-    let mut src = match guess_content(&bytes) {
+    let mut src = match guess_content(&bytes, path, binary_overrides) {
         ProbableFileKind::Text(src) => src,
         ProbableFileKind::Binary => {
             eprintln!("error: Expected a text file with conflict markers, got a binary file.");
@@ -786,10 +801,12 @@ fn diff_directories<'a>(
     display_options: &DisplayOptions,
     diff_options: &DiffOptions,
     overrides: &[(LanguageOverride, Vec<glob::Pattern>)],
+    binary_overrides: &[glob::Pattern],
 ) -> impl ParallelIterator<Item = DiffResult> + 'a {
     let diff_options = diff_options.clone();
     let display_options = display_options.clone();
     let overrides: Vec<_> = overrides.into();
+    let binary_overrides: Vec<_> = binary_overrides.into();
 
     // We greedily list all files in the directory, and then diff them
     // in parallel. This is assuming that diffing is slower than
@@ -813,6 +830,7 @@ fn diff_directories<'a>(
             &diff_options,
             true,
             &overrides,
+            &binary_overrides,
         )
     })
 }

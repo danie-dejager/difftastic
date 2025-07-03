@@ -73,7 +73,6 @@ extern "C" {
     fn tree_sitter_apex() -> ts::Language;
     fn tree_sitter_clojure() -> ts::Language;
     fn tree_sitter_cmake() -> ts::Language;
-    fn tree_sitter_commonlisp() -> ts::Language;
     fn tree_sitter_dart() -> ts::Language;
     fn tree_sitter_devicetree() -> ts::Language;
     fn tree_sitter_elisp() -> ts::Language;
@@ -97,7 +96,6 @@ extern "C" {
     fn tree_sitter_solidity() -> ts::Language;
     fn tree_sitter_sql() -> ts::Language;
     fn tree_sitter_vhdl() -> ts::Language;
-    fn tree_sitter_zig() -> ts::Language;
 }
 
 // TODO: begin/end and object/end.
@@ -227,7 +225,9 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         CommonLisp => {
-            let language = unsafe { tree_sitter_commonlisp() };
+            let language_fn = tree_sitter_commonlisp::LANGUAGE_COMMONLISP;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: ["str_lit", "char_lit"].into_iter().collect(),
@@ -1134,20 +1134,17 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Zig => {
-            let language = unsafe { tree_sitter_zig() };
+            let language_fn = tree_sitter_zig::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
-                atom_nodes: ["STRINGLITERALSINGLE", "BUILTINIDENTIFIER"]
-                    .into_iter()
-                    .collect(),
+                atom_nodes: ["string"].into_iter().collect(),
                 delimiter_tokens: vec![("{", "}"), ("[", "]"), ("(", ")")]
                     .into_iter()
                     .collect(),
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/zig.scm"),
-                )
-                .unwrap(),
+                highlight_query: ts::Query::new(&language, tree_sitter_zig::HIGHLIGHTS_QUERY)
+                    .unwrap(),
                 sub_languages: vec![],
             }
         }

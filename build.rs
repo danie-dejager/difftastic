@@ -83,11 +83,6 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
-            name: "tree-sitter-commonlisp",
-            src_dir: "vendored_parsers/tree-sitter-commonlisp-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-dart",
             src_dir: "vendored_parsers/tree-sitter-dart-src",
             extra_files: vec!["scanner.c"],
@@ -205,11 +200,6 @@ fn main() {
         TreeSitterParser {
             name: "tree-sitter-vhdl",
             src_dir: "vendored_parsers/tree-sitter-vhdl-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-zig",
-            src_dir: "vendored_parsers/tree-sitter-zig-src",
             extra_files: vec![],
         },
     ];
