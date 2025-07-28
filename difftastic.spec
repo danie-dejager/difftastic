@@ -1,6 +1,6 @@
 Name: difft
 Version: 0.64.0
-Release: 1
+Release: 2
 Summary: a structural diff that understands syntax
 
 License: MIT
