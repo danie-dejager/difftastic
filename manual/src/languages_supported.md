@@ -17,7 +17,7 @@ with `difft --list-languages`.
 | Clojure         | [sogaiu/tree-sitter-clojure](https://github.com/sogaiu/tree-sitter-clojure)                       |
 | CMake           | [uyha/tree-sitter-cmake](https://github.com/uyha/tree-sitter-cmake)                               |
 | Common Lisp     | [theHamsta/tree-sitter-commonlisp](https://github.com/theHamsta/tree-sitter-commonlisp)           |
-| Dart            | [UserNobody14/tree-sitter-dart](https://github.com/UserNobody14/tree-sitter-dart)                 |
+| Dart            | [grammar-orchard/tree-sitter-dart](https://codeberg.org/grammar-orchard/tree-sitter-dart-orchard)                 |
 | Device Tree     | [joelspadin/tree-sitter-devicetree](https://github.com/joelspadin/tree-sitter-devicetree)         |
 | Elixir          | [elixir-lang/tree-sitter-elixir](https://github.com/elixir-lang/tree-sitter-elixir)               |
 | Elm             | [elm-tooling/tree-sitter-elm](https://github.com/elm-tooling/tree-sitter-elm)                     |
@@ -58,19 +58,19 @@ with `difft --list-languages`.
 | TypeScript, TSX | [tree-sitter/tree-sitter-typescript](https://github.com/tree-sitter/tree-sitter-typescript)       |
 | Verilog         | [tree-sitter/tree-sitter-verilog](https://github.com/tree-sitter/tree-sitter-verilog)             |
 | VHDL            | [JLeemaster/tree-sitter-vhdl](https://github.com/JLeemaster/tree-sitter-vhdl)                     |
-| VHDL            | [tree-sitter-grammars/tree-sitter-zig](https://github.com/tree-sitter-grammars/tree-sitter-zig)   |
-| Zig             | [maxxnino/tree-sitter-zig](https://github.com/maxxnino/tree-sitter-zig)                           |
+| Zig             | [tree-sitter-grammars/tree-sitter-zig](https://github.com/tree-sitter-grammars/tree-sitter-zig)   |
 
 ## Structured Text Formats
 
 | Language | Parser Used                                                                                       |
 |----------|---------------------------------------------------------------------------------------------------|
 | CSS      | [tree-sitter/tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css)                     |
-| HCL      | [MichaHoffmann/tree-sitter-hcl](https://github.com/MichaHoffmann/tree-sitter-hcl)                 |
+| HCL      | [tree-sitter-grammars/tree-sitter-hcl](https://github.com/tree-sitter-grammars/tree-sitter-hcl)                 |
 | HTML     | [tree-sitter/tree-sitter-html](https://github.com/tree-sitter/tree-sitter-html)                   |
 | JSON     | [tree-sitter/tree-sitter-json](https://github.com/tree-sitter/tree-sitter-json)                   |
 | LaTeX    | [latex-lsp/tree-sitter-latex](https://github.com/latex-lsp/tree-sitter-latex)                     |
 | Newick   | [delehef/tree-sitter-newick](https://github.com/delehef/tree-sitter-newick)                       |
+| Proto    | [coder3101/tree-sitter-proto](https://github.com/coder3101/tree-sitter-proto)                     |
 | SCSS     | [serenadeai/tree-sitter-scss](https://github.com/serenadeai/tree-sitter-scss)                     |
 | TOML     | [tree-sitter-grammars/tree-sitter-toml](https://github.com/tree-sitter-grammars/tree-sitter-toml) |
 | XML      | [tree-sitter-grammars/tree-sitter-xml](https://github.com/tree-sitter-grammars/tree-sitter-xml)   |

@@ -34,6 +34,9 @@
 // Debugging features shouldn't be in checked-in code.
 #![warn(clippy::todo)]
 #![warn(clippy::dbg_macro)]
+// I frequently develop difftastic on a newer rustc than the MSRV, so
+// this isn't relevant.
+#![allow(renamed_and_removed_lints)]
 
 mod conflicts;
 mod constants;
@@ -91,10 +94,10 @@ use crate::parse::syntax;
 ///
 /// For reference, Jemalloc uses 10-20% more time (although up to 33%
 /// more instructions) when testing on sample files.
-#[cfg(not(target_env = "msvc"))]
+#[cfg(not(any(target_env = "msvc", target_os = "illumos", target_os = "freebsd")))]
 use tikv_jemallocator::Jemalloc;
 
-#[cfg(not(target_env = "msvc"))]
+#[cfg(not(any(target_env = "msvc", target_os = "illumos", target_os = "freebsd")))]
 #[global_allocator]
 static GLOBAL: Jemalloc = Jemalloc;
 
@@ -402,8 +405,6 @@ fn diff_file(
     binary_overrides: &[glob::Pattern],
 ) -> DiffResult {
     let (lhs_bytes, rhs_bytes) = read_files_or_die(lhs_path, rhs_path, missing_as_empty);
-
-    // Override here? Separate option or part of existing --override arg?
 
     let (mut lhs_src, mut rhs_src) = match (
         guess_content(&lhs_bytes, lhs_path, binary_overrides),

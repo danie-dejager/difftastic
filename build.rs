@@ -78,23 +78,8 @@ fn main() {
             extra_files: vec![],
         },
         TreeSitterParser {
-            name: "tree-sitter-cmake",
-            src_dir: "vendored_parsers/tree-sitter-cmake-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-commonlisp",
             src_dir: "vendored_parsers/tree-sitter-commonlisp-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-dart",
-            src_dir: "vendored_parsers/tree-sitter-dart-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-devicetree",
-            src_dir: "vendored_parsers/tree-sitter-devicetree-src",
             extra_files: vec![],
         },
         TreeSitterParser {
@@ -103,19 +88,9 @@ fn main() {
             extra_files: vec![],
         },
         TreeSitterParser {
-            name: "tree-sitter-elm",
-            src_dir: "vendored_parsers/tree-sitter-elm-src",
-            extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
             name: "tree-sitter-elvish",
             src_dir: "vendored_parsers/tree-sitter-elvish-src",
             extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-gleam",
-            src_dir: "vendored_parsers/tree-sitter-gleam-src",
-            extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
             name: "tree-sitter-hack",
@@ -126,11 +101,6 @@ fn main() {
             name: "tree-sitter-hare",
             src_dir: "vendored_parsers/tree-sitter-hare-src",
             extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-hcl",
-            src_dir: "vendored_parsers/tree-sitter-hcl-src",
-            extra_files: vec!["scanner.cc"],
         },
         TreeSitterParser {
             name: "tree-sitter-janet-simple",
@@ -148,11 +118,6 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
-            name: "tree-sitter-newick",
-            src_dir: "vendored_parsers/tree-sitter-newick-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-perl",
             src_dir: "vendored_parsers/tree-sitter-perl-src",
             extra_files: vec!["scanner.c"],
@@ -161,11 +126,6 @@ fn main() {
             name: "tree-sitter-qmljs",
             src_dir: "vendored_parsers/tree-sitter-qmljs-src",
             extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-r",
-            src_dir: "vendored_parsers/tree-sitter-r-src",
-            extra_files: vec!["scanner.cc"],
         },
         TreeSitterParser {
             name: "tree-sitter-racket",
@@ -183,19 +143,9 @@ fn main() {
             extra_files: vec!["scanner.c"],
         },
         TreeSitterParser {
-            name: "tree-sitter-sfapex",
-            src_dir: "vendored_parsers/tree-sitter-sfapex-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-smali",
             src_dir: "vendored_parsers/tree-sitter-smali-src",
             extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-solidity",
-            src_dir: "vendored_parsers/tree-sitter-solidity-src",
-            extra_files: vec![],
         },
         TreeSitterParser {
             name: "tree-sitter-sql",
@@ -220,6 +170,14 @@ fn main() {
     if let Some((version, _, _)) = rustc::triple() {
         println!("cargo:rustc-env=DFT_RUSTC_VERSION={}", version);
     }
+
+    // Use 64-KiB pages with jemalloc. This solves "<jemalloc>:
+    // Unsupported system page size" errors, and performs the same as
+    // jemalloc's default settings.
+    //
+    // Note that difftastic does not use jemalloc on all operating
+    // systems, but it's harmless to set this unconditionally.
+    println!("cargo:rustc-env=JEMALLOC_SYS_WITH_LG_PAGE=16");
 }
 
 fn commit_info() {

@@ -9,6 +9,7 @@ use std::{
 
 use clap::{crate_authors, crate_description, value_parser, Arg, ArgAction, Command};
 use crossterm::tty::IsTty;
+use owo_colors::OwoColorize as _;
 
 use crate::{
     display::style::BackgroundColor,
@@ -90,28 +91,64 @@ impl Default for DiffOptions {
 }
 
 fn app() -> clap::Command {
+    let bin_name = env!("CARGO_BIN_NAME");
+
+    let mut after_help = String::new();
+    after_help
+        .push_str("You can compare two files with difftastic by specifying them as arguments.\n\n");
+    after_help.push_str(&format!("$ {} old.js new.js", bin_name).bold().to_string());
+
+    after_help.push_str("\n\nYou can also use directories as arguments. Difftastic will walk both directories and compare files with matching names.\n\n");
+    after_help.push_str(&format!("$ {} old/ new/", bin_name).bold().to_string());
+
+    after_help.push_str("\n\nIf you have a file with conflict markers, you can pass it as a single argument. Difftastic will diff the two conflicting file states.\n\n");
+    after_help.push_str(
+        &format!("$ {} file_with_conflicts.js", bin_name)
+            .bold()
+            .to_string(),
+    );
+
+    // For some reason clap will hard wrap these invocations weirdly
+    // (with extra blank lines) if we use bold. Since these are
+    // showing CLI formats rather than concrete values, compromise by
+    // not using bold.
+    after_help.push_str("\n\nDifftastic can also be invoked with 7 or 9 arguments in the format that GIT_EXTERNAL_DIFF expects.\n\n");
+    after_help.push_str(&format!(
+        "$ {} DISPLAY-PATH OLD-FILE OLD-HEX OLD-MODE NEW-FILE NEW-HEX NEW-MODE",
+        bin_name
+    ));
+
+    after_help.push('\n');
+    after_help.push_str(&format!(
+        "$ {} OLD-NAME OLD-FILE OLD-HEX OLD-MODE NEW-FILE NEW-HEX NEW-MODE NEW-NAME METADATA",
+        bin_name
+    ));
+
+    after_help.push_str("\n\nSee the full manual at ");
+    if std::io::stdout().is_tty() {
+        // Make the link to the manual clickable in terminals that
+        // support OSC 8, the ANSI escape code for hyperlinks.
+        //
+        // https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+        // https://github.com/Alhadis/OSC8-Adoption
+        //
+        // There isn't any way of detecting whether the terminal
+        // supports OSC 8 specifically, but we can limit usage to when
+        // there's a TTY. This is similar to how we detect whether to
+        // use colour.
+        after_help.push_str("\x1b]8;;https://difftastic.wilfred.me.uk/\x1b\\https://difftastic.wilfred.me.uk/\x1b]8;;\x1b\\");
+    } else {
+        after_help.push_str("https://difftastic.wilfred.me.uk/");
+    }
+    after_help.push_str(".");
+
     Command::new("Difftastic")
         .override_usage(USAGE)
         .version(env!("CARGO_PKG_VERSION"))
         .long_version(VERSION.as_str())
         .about(crate_description!())
         .author(crate_authors!())
-        .after_long_help(concat!(
-            "You can compare two files with difftastic by specifying them as arguments.\n\n",
-            "$ ",
-            env!("CARGO_BIN_NAME"),
-            " old.js new.js\n\n",
-            "You can also use directories as arguments. Difftastic will walk both directories and compare files with matching names.\n\n",
-            "$ ",
-            env!("CARGO_BIN_NAME"),
-            " old/ new/\n\n",
-            "If you have a file with conflict markers, you can pass it as a single argument. Difftastic will diff the two conflicting file states.\n\n",
-            "$ ",
-            env!("CARGO_BIN_NAME"),
-            " file_with_conflicts.js\n\n",
-            "Difftastic can also be invoked with 7 arguments in the format that GIT_EXTERNAL_DIFF expects.\n\n",
-            "See the full manual at: https://difftastic.wilfred.me.uk/")
-        )
+        .after_long_help(after_help)
         .arg(
             Arg::new("dump-syntax")
                 .long("dump-syntax")
@@ -201,8 +238,8 @@ json: Output the results as a machine-readable JSON array with an element per fi
             Arg::new("background").long("background")
                 .value_name("BACKGROUND")
                 .env("DFT_BACKGROUND")
-                .value_parser(["dark", "light"])
-                .default_value("dark")
+                .value_parser(["dark", "light", "auto"])
+                .default_value("auto")
                 .action(ArgAction::Set)
                 .help("Set the background brightness. Difftastic will prefer brighter colours on dark backgrounds.")
         )
@@ -782,6 +819,7 @@ pub(crate) fn parse_args() -> Mode {
     {
         "dark" => BackgroundColor::Dark,
         "light" => BackgroundColor::Light,
+        "auto" => detect_background_color().unwrap_or(BackgroundColor::Dark),
         _ => unreachable!("clap has already validated the values"),
     };
 
@@ -843,7 +881,6 @@ pub(crate) fn parse_args() -> Mode {
         }
     }
 
-    // TODO: document these different ways of calling difftastic.
     let (display_path, lhs_path, rhs_path, lhs_permissions, rhs_permissions, renamed) = match &args
         [..]
     {
@@ -960,6 +997,15 @@ pub(crate) fn parse_args() -> Mode {
     }
 }
 
+/// Try to detect the terminal background color.
+fn detect_background_color() -> Option<BackgroundColor> {
+    match terminal_colorsaurus::theme_mode(terminal_colorsaurus::QueryOptions::default()) {
+        Ok(terminal_colorsaurus::ThemeMode::Dark) => Some(BackgroundColor::Dark),
+        Ok(terminal_colorsaurus::ThemeMode::Light) => Some(BackgroundColor::Light),
+        Err(_) => None,
+    }
+}
+
 /// Try to work out the width of the terminal we're on, or fall back
 /// to a sensible default value.
 fn detect_terminal_width() -> usize {
@@ -988,14 +1034,16 @@ fn detect_terminal_width() -> usize {
 pub(crate) fn should_use_color(color_output: ColorOutput) -> bool {
     match color_output {
         ColorOutput::Always => true,
-        ColorOutput::Auto => {
-            // Always enable colour if stdout is a TTY or if the git pager is active.
-            // TODO: consider following the env parsing logic in git_config_bool
-            // in config.c.
-            std::io::stdout().is_tty() || env::var("GIT_PAGER_IN_USE").is_ok()
-        }
+        ColorOutput::Auto => detect_color_support(),
         ColorOutput::Never => false,
     }
+}
+
+/// Always enable colour if stdout is a TTY or if the git pager is active.
+fn detect_color_support() -> bool {
+    // TODO: consider following the env parsing logic in git_config_bool
+    // in config.c.
+    std::io::stdout().is_tty() || env::var("GIT_PAGER_IN_USE").is_ok()
 }
 
 #[cfg(test)]

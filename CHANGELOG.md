@@ -1,13 +1,31 @@
-## 0.65 (unreleased)
+## 0.66 (unreleased)
+
+### Parsing
+
+Added support for protocol buffer files. Updated CMake, Solidity, HCL, Dart, Elm, Devicetree, Gleam, Newick and R parsers.
+
+### Display
+
+Difftastic is now smarter about calculating the display width for
+side-by-side diffs. Long lines that are not included in the output no
+longer affect display.
+
+The `--background` option now supports `auto` to automatically detect
+the terminal background color.
+
+## 0.65 (released 23rd September 2025)
 
 ### Build
+
+Increased the default page size of Jemalloc, so difftastic should work
+on systems with large page sizes (typically aarch64, i.e. Arm).
 
 difftastic now requires Rust 1.75 to build.
 
 ### Parsing
 
-Updated Clojure, Common Lisp and Zig parsers. Improved parsing of
-Kotlin.
+Updated Clojure, Common Lisp, Rust and Zig parsers. Improved parsing
+of Kotlin.
 
 Text encoding detection is now stricter, fixing more cases where
 binary files were treated as text.
