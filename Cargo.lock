@@ -273,7 +273,6 @@ dependencies = [
  "streaming-iterator",
  "strsim",
  "strum",
- "terminal-colorsaurus",
  "tikv-jemallocator",
  "tree-sitter",
  "tree-sitter-ada",
@@ -309,12 +308,14 @@ dependencies = [
  "tree-sitter-php",
  "tree-sitter-proto",
  "tree-sitter-python",
+ "tree-sitter-qmljs",
  "tree-sitter-r",
  "tree-sitter-racket",
  "tree-sitter-ruby",
  "tree-sitter-rust-orchard",
  "tree-sitter-scala",
  "tree-sitter-scheme",
+ "tree-sitter-sequel",
  "tree-sitter-sfapex",
  "tree-sitter-solidity",
  "tree-sitter-swift",
@@ -972,32 +973,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "terminal-colorsaurus"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f7226dad4b1817567c1e2f5d453897ef36abe79def7783af3fa241a694e30b3"
-dependencies = [
- "cfg-if",
- "libc",
- "memchr",
- "mio",
- "terminal-trx",
- "windows-sys 0.59.0",
- "xterm-color",
-]
-
-[[package]]
-name = "terminal-trx"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "975b4233aefa1b02456d5e53b22c61653c743e308c51cf4181191d8ce41753ab"
-dependencies = [
- "cfg-if",
- "libc",
- "windows-sys 0.59.0",
-]
-
-[[package]]
 name = "terminal_size"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1374,6 +1349,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tree-sitter-qmljs"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "67445ea937cd7eadaf2f628e2e7dd234374586cc31b4d1d63dbb5f5e7f9d9b62"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
 name = "tree-sitter-r"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1428,6 +1413,16 @@ name = "tree-sitter-scheme"
 version = "0.24.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a7e7f156bdf38145f26705d1733185698845307d3e9d9c071ecce4375575131"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-sequel"
+version = "0.3.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d198ad3c319c02e43c21efa1ec796b837afcb96ffaef1a40c1978fbdcec7d17"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -1766,12 +1761,6 @@ name = "wu-diff"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e3e6735fcde06432870db8dc9d7e3ab1b93727c14eaef329969426299f28893"
-
-[[package]]
-name = "xterm-color"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4de5f056fb9dc8b7908754867544e26145767187aaac5a98495e88ad7cb8a80f"
 
 [[package]]
 name = "yansi"
