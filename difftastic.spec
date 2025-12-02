@@ -1,5 +1,5 @@
 Name: difft
-Version: 0.65.0
+Version: 0.67.0
 Release: 1
 Summary: a structural diff that understands syntax
 
