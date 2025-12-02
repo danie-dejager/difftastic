@@ -18,7 +18,7 @@ their syntax.
 
 ![Screenshot of difftastic and Rust](img/wrap_expr.png)
 
-^ Difftastic understands exactly which pieces of syntax has changed,
+^ Difftastic understands exactly which pieces of syntax have changed,
 and can highlight them in context.
 
 ![Screenshot of difftastic and HTML](img/html.png)
@@ -32,20 +32,19 @@ an indentation change.
 now split over multiple lines, difftastic will show you what's
 actually changed.
 
-## One Minute Demo
+![Screenshot of difftastic and git](img/git.png)
 
-[![asciicast](https://asciinema.org/a/480875.svg)](https://asciinema.org/a/480875)
+^ Difftastic is compatible with git (see [the configuration
+instructions](http://difftastic.wilfred.me.uk/git.html)), as well as
+many other version control systems.
 
-This one minute screencast demonstrates difftastic usage with both
-standalone files and git.
-
-## Languages
+## Languages Supported
 
 Difftastic supports over 30 programming languages, see [the
 manual](https://difftastic.wilfred.me.uk/languages_supported.html) for the full list.
 
 If a file has an unrecognised extension, difftastic uses a
-textual diff with word highlighting.
+line-oriented diff with word highlighting.
 
 ## Known Issues
 
@@ -201,4 +200,4 @@ the `vendored_parsers/` directory. These are a mix of the MIT license and the
 Apache license. See `vendored_parsers/*/LICENSE` for more details.
 
 Files in `sample_files/` are also under the MIT license unless stated
-otherwise in their header.
+otherwise in their headers.

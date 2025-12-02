@@ -243,7 +243,7 @@ checksum = "6184e33543162437515c2e2b48714794e37845ec9851711914eec9d308f6ebe8"
 
 [[package]]
 name = "difftastic"
-version = "0.66.0"
+version = "0.68.0"
 dependencies = [
  "assert_cmd",
  "bumpalo",
@@ -279,11 +279,13 @@ dependencies = [
  "tree-sitter-bash",
  "tree-sitter-c",
  "tree-sitter-c-sharp",
+ "tree-sitter-clojure-orchard",
  "tree-sitter-cmake",
  "tree-sitter-cpp",
  "tree-sitter-css",
  "tree-sitter-dart-orchard",
  "tree-sitter-devicetree",
+ "tree-sitter-elisp",
  "tree-sitter-elixir",
  "tree-sitter-elm",
  "tree-sitter-erlang",
@@ -1063,6 +1065,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tree-sitter-clojure-orchard"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62ff7bdebec1f2578787697e32b5539842b8ea9e35df784b537c22cf1ed1aa8f"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
 name = "tree-sitter-cmake"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1107,6 +1119,16 @@ name = "tree-sitter-devicetree"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1e6874b59d8252cbaf9750f7152166e17ed162921a5f6d4e8bd2a2bc2aed46b"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-elisp"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e2e9a6ab3cebf24ca41cdc1f985549b9b33f7ef25c19ac7d18e53a4ee24da09"
 dependencies = [
  "cc",
  "tree-sitter-language",

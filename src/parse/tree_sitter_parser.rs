@@ -69,9 +69,7 @@ pub(crate) struct TreeSitterConfig {
 }
 
 extern "C" {
-    fn tree_sitter_clojure() -> ts::Language;
     fn tree_sitter_commonlisp() -> ts::Language;
-    fn tree_sitter_elisp() -> ts::Language;
     fn tree_sitter_elvish() -> ts::Language;
     fn tree_sitter_hare() -> ts::Language;
     fn tree_sitter_hack() -> ts::Language;
@@ -146,7 +144,7 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
 
             TreeSitterConfig {
                 language: language.clone(),
-                atom_nodes: ["string", "raw_string", "heredoc_body"]
+                atom_nodes: ["string", "raw_string", "heredoc_body", "simple_expansion"]
                     .into_iter()
                     .collect(),
                 delimiter_tokens: vec![("(", ")"), ("{", "}"), ("[", "]")],
@@ -184,7 +182,9 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Clojure => {
-            let language = unsafe { tree_sitter_clojure() };
+            let language_fn = tree_sitter_clojure_orchard::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: ["kwd_lit", "regex_lit"].into_iter().collect(),
@@ -193,7 +193,7 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
                     .collect(),
                 highlight_query: ts::Query::new(
                     &language,
-                    include_str!("../../vendored_parsers/highlights/clojure.scm"),
+                    tree_sitter_clojure_orchard::HIGHLIGHTS_QUERY,
                 )
                 .unwrap(),
                 sub_languages: vec![],
@@ -342,7 +342,9 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         EmacsLisp => {
-            let language = unsafe { tree_sitter_elisp() };
+            let language_fn = tree_sitter_elisp::LANGUAGE;
+            let language = tree_sitter::Language::new(language_fn);
+
             TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: [].into_iter().collect(),
@@ -925,7 +927,9 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
 
             TreeSitterConfig {
                 language: language.clone(),
-                atom_nodes: ["char_literal", "string_literal"].into_iter().collect(),
+                atom_nodes: ["char_literal", "string_literal", "raw_string_literal"]
+                    .into_iter()
+                    .collect(),
                 delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]"), ("|", "|"), ("<", ">")],
                 highlight_query: ts::Query::new(
                     &language,

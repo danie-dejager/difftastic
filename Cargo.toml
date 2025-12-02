@@ -4,7 +4,7 @@ description = "A structural diff that understands syntax."
 repository = "https://github.com/wilfred/difftastic"
 homepage = "http://difftastic.wilfred.me.uk/"
 license = "MIT"
-version = "0.66.0"
+version = "0.68.0"
 authors = ["Wilfred Hughes <me@wilfred.me.uk>"]
 keywords = ["diff", "syntax"]
 categories = ["development-tools", "command-line-utilities", "parser-implementations"]
@@ -80,11 +80,13 @@ tree-sitter-ada = "0.1.0"
 tree-sitter-bash = "0.23.3"
 tree-sitter-c = "0.23.4"
 tree-sitter-c-sharp = "0.23.1"
+tree-sitter-clojure-orchard = "0.2.0"
 tree-sitter-cmake = "0.7.1"
 tree-sitter-cpp = "0.23.4"
 tree-sitter-css = "0.23.1"
 tree-sitter-dart-orchard = "0.2.1"
 tree-sitter-devicetree = "0.14.1"
+tree-sitter-elisp = "1.6.1"
 tree-sitter-elixir = "0.3.4"
 tree-sitter-elm = "5.8.0"
 tree-sitter-erlang = "0.13.0"
@@ -148,5 +150,15 @@ lto = "thin"
 [[bin]]
 name = "difft"
 path = "src/main.rs"
+
+[package.metadata.deb]
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+	"$auto",
+	[ "difft.1", "usr/share/man/man1/", "644" ],
+	[ "CHANGELOG.md", "usr/share/doc/difftastic/", "644" ],
+]
 
 [features]

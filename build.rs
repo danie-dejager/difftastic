@@ -68,18 +68,8 @@ impl TreeSitterParser {
 fn main() {
     let parsers = vec![
         TreeSitterParser {
-            name: "tree-sitter-clojure",
-            src_dir: "vendored_parsers/tree-sitter-clojure-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-commonlisp",
             src_dir: "vendored_parsers/tree-sitter-commonlisp-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-elisp",
-            src_dir: "vendored_parsers/tree-sitter-elisp-src",
             extra_files: vec![],
         },
         TreeSitterParser {

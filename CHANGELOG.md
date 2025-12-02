@@ -1,14 +1,41 @@
-## 0.66 (unreleased)
+## 0.68 (unreleased)
 
 ### Parsing
 
-Added support for protocol buffer files. Updated CMake, Solidity, HCL, Dart, Elm, Devicetree, Gleam, Newick, Racket, Scheme, Ada, SQL, QMLJS and R parsers.
+Fixed an issue with parsing raw string literals in Rust.
+
+## 0.67 (released 16 November 2025)
+
+### Parsing
+
+Added support for protocol buffer files. Updated Ada, Clojure, CMake, Dart,
+Devicetree, Elisp, Elm, Gleam, HCL, Newick, QML, R, Racket, SQL, Scheme, and
+Solidity parsers.
+
+Improved handling of variable names `$foo` in shell scripts.
+
+Improved detection of YAML files.
+
+### Diffing
+
+Improved subword highlighting for words with hyphens.
 
 ### Display
 
 Difftastic is now smarter about calculating the display width for
 side-by-side diffs. Long lines that are not included in the output no
 longer affect display.
+
+Improved descriptions of changes to binary files.
+
+Fixed an issue (introduced after 0.65) where difftastic would not use
+the full width of the terminal on side-by-side diffs when files had
+more than 1,000 lines.
+
+## 0.66 (skipped)
+
+Due to an issue with the release process, 0.66 was abandoned in favour
+of doing a normal release with version 0.67.
 
 ## 0.65 (released 23rd September 2025)
 

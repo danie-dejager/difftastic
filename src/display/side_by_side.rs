@@ -23,6 +23,7 @@ use crate::{
     summary::FileFormat,
 };
 
+/// The single space shown between LHS and RHS columns.
 const SPACER: &str = " ";
 
 fn format_line_num_padded(line_num: LineNumber, column_width: usize) -> String {
@@ -199,15 +200,17 @@ impl SourceDimensions {
         // between LHS and RHS.
         //
         // Instead, cap the display width based on the maximum length
-        // of lines within the file.
+        // of visible lines within the file.
         //
-        // This is a crude heuristic because it ignores which lines of
-        // the file actually get displayed, so we can still end up
-        // with some superfluous space. It also naively assumes that
-        // byte length is the same display length, which is generally
-        // OK because byte length will tend to be larger than the
-        // display length.
-        let display_width = min(terminal_width, (content_max_width + 4) * 2 + SPACER.len());
+        // This naively assumes that byte length is the same as
+        // display length, which is generally OK because byte length
+        // will tend to be larger than the display length.
+        let width_without_truncation = lhs_line_nums_width
+            + content_max_width
+            + SPACER.len()
+            + rhs_line_nums_width
+            + content_max_width;
+        let display_width = min(terminal_width, width_without_truncation);
 
         assert!(
             display_width > SPACER.len(),

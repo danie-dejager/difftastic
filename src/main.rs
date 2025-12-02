@@ -4,6 +4,9 @@
 //! manual](http://difftastic.wilfred.me.uk/).
 //!
 
+// I frequently develop difftastic on a newer rustc than the MSRV, so
+// these two aren't relevant.
+#![allow(renamed_and_removed_lints)]
 // This tends to trigger on larger tuples of simple types, and naming
 // them would probably be worse for readability.
 #![allow(clippy::type_complexity)]
@@ -37,9 +40,6 @@
 // Debugging features shouldn't be in checked-in code.
 #![warn(clippy::todo)]
 #![warn(clippy::dbg_macro)]
-// I frequently develop difftastic on a newer rustc than the MSRV, so
-// this isn't relevant.
-#![allow(renamed_and_removed_lints)]
 
 mod conflicts;
 mod constants;
@@ -59,7 +59,6 @@ mod words;
 #[macro_use]
 extern crate log;
 
-use crossterm::tty::IsTty as _;
 use display::style::print_warning;
 use log::info;
 use options::FilePermissions;
@@ -72,6 +71,7 @@ use crate::diff::dijkstra::ExceededGraphLimit;
 use crate::diff::{dijkstra, unchanged};
 use crate::display::context::opposite_positions;
 use crate::display::hunks::{matched_pos_to_hunks, merge_adjacent};
+use crate::display::style::print_error;
 use crate::exit_codes::EXIT_BAD_ARGUMENTS;
 use crate::exit_codes::{EXIT_FOUND_CHANGES, EXIT_SUCCESS};
 use crate::files::{
@@ -500,7 +500,10 @@ fn diff_conflicts_file(
     let mut src = match guess_content(&bytes, path, binary_overrides) {
         ProbableFileKind::Text(src) => src,
         ProbableFileKind::Binary => {
-            eprintln!("error: Expected a text file with conflict markers, got a binary file.");
+            print_error(
+                "Expected a text file with conflict markers, got a binary file.",
+                display_options.use_color,
+            );
             std::process::exit(EXIT_BAD_ARGUMENTS);
         }
     };
@@ -512,20 +515,22 @@ fn diff_conflicts_file(
     let conflict_files = match apply_conflict_markers(&src) {
         Ok(cf) => cf,
         Err(msg) => {
-            eprintln!("error: {}", msg);
+            print_error(&msg, display_options.use_color);
             std::process::exit(EXIT_BAD_ARGUMENTS);
         }
     };
 
     if conflict_files.num_conflicts == 0 {
-        eprintln!(
-            "{}: Difftastic requires two paths, or a single file with conflict markers {}.\n",
-            if std::io::stdout().is_tty() {
-                "error".red().bold().to_string()
-            } else {
-                "error".to_owned()
-            },
-            START_LHS_MARKER,
+        print_error(
+            &format!(
+                "Difftastic requires two paths, or a single file with conflict markers {}.\n",
+                if display_options.use_color {
+                    START_LHS_MARKER.bold().to_string()
+                } else {
+                    START_LHS_MARKER.to_owned()
+                }
+            ),
+            display_options.use_color,
         );
 
         eprintln!("USAGE:\n\n    {}\n", USAGE);
@@ -974,11 +979,31 @@ fn print_diff_result(display_options: &DisplayOptions, summary: &DiffResult) {
                 match summary.has_byte_changes {
                     Some((lhs_len, rhs_len)) => {
                         let format_options = FormatSizeOptions::from(BINARY).decimal_places(1);
-                        println!(
-                            "Binary contents changed (old: {}, new: {}).\n",
-                            &format_size(lhs_len, format_options),
-                            &format_size(rhs_len, format_options),
-                        )
+
+                        if lhs_len == 0 {
+                            // Strictly speaking this is wrong:
+                            // previously we may have had an empty but
+                            // existent file. In that case, it's a
+                            // file modification instead of a file
+                            // creation.
+                            //
+                            // TODO: Fix this pedantic case.
+                            println!(
+                                "Binary file added ({}).\n",
+                                &format_size(rhs_len, format_options),
+                            )
+                        } else if rhs_len == 0 {
+                            println!(
+                                "Binary file removed ({}).\n",
+                                &format_size(lhs_len, format_options),
+                            )
+                        } else {
+                            println!(
+                                "Binary file modified (old: {}, new: {}).\n",
+                                &format_size(lhs_len, format_options),
+                                &format_size(rhs_len, format_options),
+                            )
+                        }
                     }
                     None => println!("No changes.\n"),
                 }
