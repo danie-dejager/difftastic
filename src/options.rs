@@ -308,7 +308,7 @@ When multiple overrides are specified, the first matching override wins."))
             Arg::new("override-binary").long("override-binary")
                 .value_name("GLOB")
                 .action(ArgAction::Append)
-                .help(concat!("Treat file names matching this glob as binary files, overriding normal binary detection. For example:
+                .help(concat!("Always treat file names matching this glob as binary files, ignoring the default heuristics for binary detection. For example:
 
 $ ", env!("CARGO_BIN_NAME"), " --override-binary='*.gz' old.gz new.gz
 
@@ -540,6 +540,9 @@ pub(crate) enum Mode {
         binary_overrides: Vec<glob::Pattern>,
         path: FileArgument,
         /// The path that we show to the user.
+        display_path: String,
+    },
+    GitHasUnmergedFile {
         display_path: String,
     },
     ListLanguages {
@@ -867,6 +870,22 @@ pub(crate) fn parse_args() -> Mode {
         .unwrap_or_default()
         .collect::<Vec<_>>();
     info!("CLI arguments: {:?}", args);
+
+    // When there's a single path that hasn't been merged, git invokes
+    // the external diff tool with a only single argument. There's
+    // nothing to diff against.
+    //
+    // In this case, we just inform the user that there's an unmerged
+    // file, matching the builtin git-diff behaviour.
+    if args.len() == 1
+        && (env::var_os("GIT_EXEC_PATH").is_some()
+            || env::var_os("GIT_CONFIG_PARAMETERS").is_some()
+            || env::var_os("GIT_DIFF_PATH_TOTAL").is_some())
+    {
+        return Mode::GitHasUnmergedFile {
+            display_path: args[0].to_string_lossy().to_string(),
+        };
+    }
 
     // Print git environment variables so we can see the additional
     // variable set when git invokes us.
