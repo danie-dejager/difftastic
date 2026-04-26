@@ -69,11 +69,6 @@ impl TreeSitterParser {
 fn main() {
     let parsers = vec![
         TreeSitterParser {
-            name: "tree-sitter-commonlisp",
-            src_dir: "vendored_parsers/tree-sitter-commonlisp-src",
-            extra_files: vec![],
-        },
-        TreeSitterParser {
             name: "tree-sitter-elvish",
             src_dir: "vendored_parsers/tree-sitter-elvish-src",
             extra_files: vec![],
@@ -112,11 +107,6 @@ fn main() {
             name: "tree-sitter-smali",
             src_dir: "vendored_parsers/tree-sitter-smali-src",
             extra_files: vec!["scanner.c"],
-        },
-        TreeSitterParser {
-            name: "tree-sitter-vhdl",
-            src_dir: "vendored_parsers/tree-sitter-vhdl-src",
-            extra_files: vec![],
         },
     ];
 

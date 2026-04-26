@@ -10,6 +10,7 @@ with `difft --list-languages`.
 |-----------------|---------------------------------------------------------------------------------------------------|
 | Ada             | [briot/tree-sitter-ada](https://github.com/briot/tree-sitter-ada)                                 |
 | Apex            | [aheber/tree-sitter-sfapex](https://github.com/aheber/tree-sitter-sfapex)                         |
+| Assembly        | [RubixDev/tree-sitter-asm](https://github.com/RubixDev/tree-sitter-asm)                   |
 | Bash            | [tree-sitter/tree-sitter-bash](https://github.com/tree-sitter/tree-sitter-bash)                   |
 | C               | [tree-sitter/tree-sitter-c](https://github.com/tree-sitter/tree-sitter-c)                         |
 | C++             | [tree-sitter/tree-sitter-cpp](https://github.com/tree-sitter/tree-sitter-cpp)                     |
@@ -42,7 +43,7 @@ with `difft --list-languages`.
 | Objective-C     | [amaanq/tree-sitter-objc](https://github.com/amaanq/tree-sitter-objc)                             |
 | OCaml           | [tree-sitter/tree-sitter-ocaml](https://github.com/tree-sitter/tree-sitter-ocaml)                 |
 | Pascal          | [Isopod/tree-sitter-pascal](https://github.com/Isopod/tree-sitter-pascal)                         |
-| Perl            | [ganezdragon/tree-sitter-perl](https://github.com/ganezdragon/tree-sitter-perl)                   |
+| Perl            | [tree-sitter-perl/tree-sitter-perl](https://github.com/tree-sitter-perl/tree-sitter-perl)         |
 | PHP             | [tree-sitter/tree-sitter-php](https://github.com/tree-sitter/tree-sitter-php)                     |
 | Python          | [tree-sitter/tree-sitter-python](https://github.com/tree-sitter/tree-sitter-python)               |
 | QML             | [yuja/tree-sitter-qmljs](https://github.com/yuja/tree-sitter-qmljs)                               |
