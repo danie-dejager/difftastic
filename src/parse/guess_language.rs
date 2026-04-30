@@ -41,7 +41,6 @@ pub(crate) enum Language {
     Fortran,
     Gleam,
     Go,
-    Hack,
     Hare,
     Haskell,
     Hcl,
@@ -144,7 +143,6 @@ pub(crate) fn language_name(language: Language) -> &'static str {
         Fortran => "Fortran",
         Gleam => "Gleam",
         Go => "Go",
-        Hack => "Hack",
         Hare => "Hare",
         Haskell => "Haskell",
         Hcl => "HCL",
@@ -289,7 +287,6 @@ pub(crate) fn language_globs(language: Language) -> Vec<glob::Pattern> {
         Fortran => &["*.f", "*.for", "*.f90", "*.F", "*.FOR", "*.F90"],
         Gleam => &["*.gleam"],
         Go => &["*.go"],
-        Hack => &["*.hack", "*.hck", "*.hhi"],
         Hare => &["*.ha"],
         Haskell => &["*.hs"],
         Hcl => &["*.hcl", "*.nomad", "*.tf", "*.tfvars", "*.workflow"],
@@ -497,7 +494,7 @@ pub(crate) fn guess(
     // specifically *.php as potentially Hack or *.h as potentially
     // Objective-C.
     if looks_like_hacklang(path, src) {
-        return Some(Language::Hack);
+        return None;
     }
     if looks_like_objc(path, src) {
         return Some(Language::ObjC);
@@ -601,7 +598,6 @@ fn from_shebang(src: &str) -> Option<Language> {
                     "elixir" => return Some(Elixir),
                     "elvish" => return Some(Elvish),
                     "escript" => return Some(Erlang),
-                    "hhvm" => return Some(Hack),
                     "runghc" | "runhaskell" | "runhugs" => return Some(Haskell),
                     "chakra" | "d8" | "gjs" | "js" | "node" | "nodejs" | "qjs" | "rhino" | "v8"
                     | "v8-shell" => return Some(JavaScript),
@@ -615,11 +611,6 @@ fn from_shebang(src: &str) -> Option<Language> {
                     _ => {}
                 }
             }
-        }
-
-        // Hack can use <?hh in files with a .php extension.
-        if first_line.starts_with("<?hh") {
-            return Some(Hack);
         }
     }
 

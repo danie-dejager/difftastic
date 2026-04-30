@@ -86,7 +86,7 @@ sample_files/fortran_1.f90 sample_files/fortran_2.f90
 b5fae2c0a3e0755ca8182df1f728400b  -
 
 sample_files/hack_1.php sample_files/hack_2.php
-c2bb0aa7d7b07d6ced79f6a5363e878b  -
+fd23895fca3cb3e70b5ffd364f8c30fe  -
 
 sample_files/hare_1.ha sample_files/hare_2.ha
 e344b3fa7bc35fd4a0f3c7cecab39447  -
@@ -294,6 +294,9 @@ sample_files/todomvc_1.gleam sample_files/todomvc_2.gleam
 
 sample_files/toml_1.toml sample_files/toml_2.toml
 e1002ceba14d973fcc8abc23619e65b0  -
+
+sample_files/trailing_commas_1.js sample_files/trailing_commas_2.js
+9ca72e199466c75f85d00f4d521e85ff  -
 
 sample_files/trailling_newline_1.yaml sample_files/trailling_newline_2.yaml
 763e6f9720a1f4e448d547c361f22c68  -

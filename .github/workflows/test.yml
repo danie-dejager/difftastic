@@ -37,7 +37,7 @@ jobs:
 
     - name: Install cross
       if: matrix.job.use-cross
-      uses: taiki-e/install-action@v2
+      uses: taiki-e/install-action@1329c298aa20c3257846c9b2e0e55967df3e3c37 # v2
       with:
         tool: cross@0.2.5
 
@@ -105,7 +105,7 @@ jobs:
     steps:
       # v4.2.2
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: raven-actions/actionlint@v2
+      - uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2
         with:
           shellcheck: false
 

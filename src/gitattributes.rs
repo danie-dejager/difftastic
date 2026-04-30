@@ -47,6 +47,11 @@ pub(crate) fn check_diff_attr(path: &Path) -> Option<DiffAttribute> {
             }
 
             let output = &output.stdout;
+            debug!(
+                "git check-attr output: {:?}",
+                String::from_utf8_lossy(output)
+            );
+
             match parse_output(output) {
                 Some(res) => {
                     trace!("git check-attr result: {:?}", res);

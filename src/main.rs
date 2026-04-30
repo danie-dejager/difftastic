@@ -339,6 +339,9 @@ fn main() {
                         thread::scope(|s| {
                             let (send, recv) = std::sync::mpsc::sync_channel(1);
 
+                            // I don't see a nice way of fixing this, and difftastic is regularly benchmarked
+                            // for performance issues and this hasn't been a problem.
+                            #[allow(clippy::result_large_err)]
                             s.spawn(move || {
                                 diff_iter
                                     .try_for_each_with(send, |s, diff_result| s.send(diff_result))
