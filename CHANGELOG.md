@@ -1,5 +1,13 @@
 ## 0.70 (unreleased)
 
+### Diffing
+
+Improved diffing performance, particularly when diffing directories.
+
+### Parsing
+
+Removed support for SCSS (upstream parser is no longer maintained).
+
 ## 0.69 (released 30th April 2026)
 
 ## Diffing

@@ -17,7 +17,7 @@ use strum::{EnumIter, IntoEnumIterator};
 
 /// Languages supported by difftastic. Each language here has a
 /// corresponding tree-sitter parser.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub(crate) enum Language {
     Ada,
     Apex,
@@ -72,7 +72,6 @@ pub(crate) enum Language {
     Rust,
     Scala,
     Scheme,
-    Scss,
     Smali,
     Solidity,
     Sql,
@@ -175,7 +174,6 @@ pub(crate) fn language_name(language: Language) -> &'static str {
         Scala => "Scala",
         Scheme => "Scheme",
         Smali => "Smali",
-        Scss => "SCSS",
         Solidity => "Solidity",
         Sql => "SQL",
         Swift => "Swift",
@@ -377,7 +375,6 @@ pub(crate) fn language_globs(language: Language) -> Vec<glob::Pattern> {
         Scala => &["*.scala", "*.sbt", "*.sc"],
         Scheme => &["*.scm", "*.sch", "*.ss"],
         Smali => &["*.smali"],
-        Scss => &["*.scss"],
         Solidity => &["*.sol"],
         Sql => &["*.sql", "*.pgsql"],
         Swift => &["*.swift"],
@@ -561,7 +558,6 @@ fn from_emacs_mode_header(src: &str) -> Option<Language> {
             "ruby" => Ruby,
             "rust" => Rust,
             "scala" => Scala,
-            "scss" => Scss,
             "sh" => Bash,
             "solidity" => Solidity,
             "sql" => Sql,
