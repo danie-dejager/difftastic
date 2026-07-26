@@ -82,7 +82,6 @@ pub(crate) struct TreeSitterConfig {
 }
 
 extern "C" {
-    fn tree_sitter_elvish() -> ts::Language;
     fn tree_sitter_hare() -> ts::Language;
     fn tree_sitter_janet_simple() -> ts::Language;
     fn tree_sitter_kotlin() -> ts::Language;
@@ -380,21 +379,6 @@ fn build_config(language: guess::Language) -> TreeSitterConfig {
                 sub_languages: vec![],
             }
         }
-        Elvish => {
-            let language = unsafe { tree_sitter_elvish() };
-            TreeSitterConfig {
-                language: language.clone(),
-                atom_nodes: [].into_iter().collect(),
-                delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]"), ("|", "|")],
-                ignore_trailing_tokens: vec![],
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/elvish.scm"),
-                )
-                .unwrap(),
-                sub_languages: vec![],
-            }
-        }
         EmacsLisp => {
             let language_fn = tree_sitter_elisp::LANGUAGE;
             let language = tree_sitter::Language::new(language_fn);
@@ -428,6 +412,22 @@ fn build_config(language: guess::Language) -> TreeSitterConfig {
                 sub_languages: vec![],
             }
         }
+        Fish => {
+            let language = tree_sitter_fish::language();
+            let highlight_query =
+                ts::Query::new(&language, tree_sitter_fish::HIGHLIGHTS_QUERY).unwrap();
+
+            TreeSitterConfig {
+                language,
+                atom_nodes: ["single_quote_string", "double_quote_string"]
+                    .into_iter()
+                    .collect(),
+                delimiter_tokens: vec![("(", ")"), ("{", "}"), ("[", "]")],
+                ignore_trailing_tokens: vec![],
+                highlight_query,
+                sub_languages: vec![],
+            }
+        }
         FSharp => {
             let language_fn = tree_sitter_fsharp::LANGUAGE_FSHARP;
             let language = tree_sitter::Language::new(language_fn);
@@ -448,14 +448,11 @@ fn build_config(language: guess::Language) -> TreeSitterConfig {
             let language = tree_sitter::Language::new(language_fn);
             TreeSitterConfig {
                 language: language.clone(),
-                atom_nodes: ["string_literal"].into_iter().collect(),
+                atom_nodes: ["string_literal", "number_literal"].into_iter().collect(),
                 delimiter_tokens: vec![("(", ")"), ("(/", "/)"), ("[", "]")],
                 ignore_trailing_tokens: vec![],
-                highlight_query: ts::Query::new(
-                    &language,
-                    include_str!("../../vendored_parsers/highlights/fortran.scm"),
-                )
-                .unwrap(),
+                highlight_query: ts::Query::new(&language, tree_sitter_fortran::HIGHLIGHTS_QUERY)
+                    .unwrap(),
                 sub_languages: vec![],
             }
         }
@@ -610,7 +607,7 @@ fn build_config(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Java => {
-            let language_fn = tree_sitter_java::LANGUAGE;
+            let language_fn = tree_sitter_java_orchard::LANGUAGE;
             let language = tree_sitter::Language::new(language_fn);
             TreeSitterConfig {
                 language: language.clone(),
@@ -634,8 +631,11 @@ fn build_config(language: guess::Language) -> TreeSitterConfig {
                 delimiter_tokens: vec![("(", ")"), ("{", "}"), ("[", "]")],
                 // There aren't many places where Java allows trailing commas.
                 ignore_trailing_tokens: vec![("enum_body", ","), ("array_initializer", ",")],
-                highlight_query: ts::Query::new(&language, tree_sitter_java::HIGHLIGHTS_QUERY)
-                    .unwrap(),
+                highlight_query: ts::Query::new(
+                    &language,
+                    tree_sitter_java_orchard::HIGHLIGHTS_QUERY,
+                )
+                .unwrap(),
                 sub_languages: vec![],
             }
         }
@@ -1147,7 +1147,13 @@ fn build_config(language: guess::Language) -> TreeSitterConfig {
                 language: language.clone(),
                 atom_nodes: ["string", "quoted_key"].into_iter().collect(),
                 delimiter_tokens: vec![("{", "}"), ("[", "]")],
-                ignore_trailing_tokens: vec![],
+                ignore_trailing_tokens: vec![
+                    // Arrays have always supported trailing commas.
+                    ("array", ","),
+                    // Inline tables support trailing commas as of TOML 1.1
+                    // https://github.com/toml-lang/toml/pull/904
+                    // but the tree-sitter parser doesn't allow that syntax yet.
+                ],
                 highlight_query: ts::Query::new(&language, tree_sitter_toml_ng::HIGHLIGHTS_QUERY)
                     .unwrap(),
                 sub_languages: vec![],
@@ -1759,7 +1765,7 @@ fn syntax_from_cursor<'a>(
 
 /// Does `node` match the ignorable trailing tokens configuration for
 /// this language?
-fn should_ignore_last_child(
+fn can_ignore_last_child(
     config: &TreeSitterConfig,
     node: &ts::Node<'_>,
     children: &[&Syntax<'_>],
@@ -1799,21 +1805,23 @@ fn list_from_cursor<'a>(
     >,
     ignore_comments: bool,
 ) -> &'a Syntax<'a> {
-    let root_node = cursor.node();
+    let list_root_node = cursor.node();
 
     // We may not have an enclosing delimiter for this list. Use "" as
     // the delimiter text and the start/end of this node as the
     // delimiter positions.
     let outer_open_content = "";
-    let outer_open_position = nl_pos.from_region(root_node.start_byte(), root_node.start_byte());
+    let outer_open_position =
+        nl_pos.from_region(list_root_node.start_byte(), list_root_node.start_byte());
     let outer_close_content = "";
-    let outer_close_position = nl_pos.from_region(root_node.end_byte(), root_node.end_byte());
+    let outer_close_position =
+        nl_pos.from_region(list_root_node.end_byte(), list_root_node.end_byte());
 
     // TODO: this should probably only allow the delimiters to be the
     // first and last child in the list.
     let (i, j) = match find_delim_positions(src, cursor, &config.delimiter_tokens) {
         Some((i, j)) => (i as isize, j as isize),
-        None => (-1, root_node.child_count() as isize),
+        None => (-1, list_root_node.child_count() as isize),
     };
 
     let mut inner_open_content = outer_open_content;
@@ -1892,7 +1900,7 @@ fn list_from_cursor<'a>(
     }
     cursor.goto_parent();
 
-    if should_ignore_last_child(config, &root_node, &between_delim) {
+    if can_ignore_last_child(config, &list_root_node, &between_delim) {
         if let Some(Syntax::Atom {
             position, content, ..
         }) = between_delim.pop()

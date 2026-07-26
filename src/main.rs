@@ -66,8 +66,8 @@ use options::{FilePermissions, USAGE};
 
 use crate::conflicts::{apply_conflict_markers, START_LHS_MARKER};
 use crate::diff::changes::ChangeMap;
-use crate::diff::dijkstra::ExceededGraphLimit;
-use crate::diff::{dijkstra, unchanged};
+use crate::diff::shortest_path::ExceededGraphLimit;
+use crate::diff::{shortest_path, unchanged};
 use crate::display::context::opposite_positions;
 use crate::display::hunks::{matched_pos_to_hunks, merge_adjacent};
 use crate::display::style::print_error;
@@ -115,11 +115,11 @@ use strum::IntoEnumIterator;
 use typed_arena::Arena;
 
 use crate::diff::sliders::fix_all_sliders;
-use crate::dijkstra::mark_syntax;
 use crate::lines::MaxLine;
 use crate::options::{DiffOptions, DisplayMode, DisplayOptions, FileArgument, Mode};
 use crate::parse::syntax::init_all_info;
 use crate::parse::tree_sitter_parser as tsp;
+use crate::shortest_path::mark_syntax;
 use crate::summary::{DiffResult, FileContent, FileFormat};
 use crate::syntax::init_next_prev;
 
@@ -649,8 +649,7 @@ fn diff_file_content(
                 return check_only_text(&file_format, display_path, extra_info, lhs_src, rhs_src);
             }
 
-            let lhs_positions = line_parser::change_positions(lhs_src, rhs_src);
-            let rhs_positions = line_parser::change_positions(rhs_src, lhs_src);
+            let (lhs_positions, rhs_positions) = line_parser::change_positions(lhs_src, rhs_src);
             (file_format, lhs_positions, rhs_positions)
         }
         Some((language, lang_config)) => {
@@ -718,8 +717,8 @@ fn diff_file_content(
                             }
 
                             if exceeded_graph_limit {
-                                let lhs_positions = line_parser::change_positions(lhs_src, rhs_src);
-                                let rhs_positions = line_parser::change_positions(rhs_src, lhs_src);
+                                let (lhs_positions, rhs_positions) =
+                                    line_parser::change_positions(lhs_src, rhs_src);
                                 (
                                     FileFormat::TextFallback {
                                         reason: "exceeded DFT_GRAPH_LIMIT".into(),
@@ -771,8 +770,8 @@ fn diff_file_content(
                                 );
                             }
 
-                            let lhs_positions = line_parser::change_positions(lhs_src, rhs_src);
-                            let rhs_positions = line_parser::change_positions(rhs_src, lhs_src);
+                            let (lhs_positions, rhs_positions) =
+                                line_parser::change_positions(lhs_src, rhs_src);
                             (file_format, lhs_positions, rhs_positions)
                         }
                     }
@@ -796,8 +795,8 @@ fn diff_file_content(
                         );
                     }
 
-                    let lhs_positions = line_parser::change_positions(lhs_src, rhs_src);
-                    let rhs_positions = line_parser::change_positions(rhs_src, lhs_src);
+                    let (lhs_positions, rhs_positions) =
+                        line_parser::change_positions(lhs_src, rhs_src);
                     (file_format, lhs_positions, rhs_positions)
                 }
             }

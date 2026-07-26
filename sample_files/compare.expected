@@ -73,17 +73,17 @@ sample_files/elixir_1.ex sample_files/elixir_2.ex
 sample_files/elm_1.elm sample_files/elm_2.elm
 8a67269f2dd2e4913f885b3b6e6d6a07  -
 
-sample_files/elvish_1.elv sample_files/elvish_2.elv
-93af1d46752d57db84011ca7482ae842  -
-
 sample_files/erlang_1.erl sample_files/erlang_2.erl
 77c259baf4751716db4da1503088e742  -
 
 sample_files/f_sharp_1.fs sample_files/f_sharp_2.fs
 63defe290bfc6754b51457a6c374838b  -
 
+sample_files/fish_1.fish sample_files/fish_2.fish
+707c9e00520b380813342c33a9d0f2d3  -
+
 sample_files/fortran_1.f90 sample_files/fortran_2.f90
-b5fae2c0a3e0755ca8182df1f728400b  -
+1ebdd5ffb38cd1d4813afa8dcdef1c2f  -
 
 sample_files/hack_1.php sample_files/hack_2.php
 fd23895fca3cb3e70b5ffd364f8c30fe  -
@@ -290,7 +290,7 @@ sample_files/todomvc_1.gleam sample_files/todomvc_2.gleam
 725bb793f219e13cee199f18ffaed872  -
 
 sample_files/toml_1.toml sample_files/toml_2.toml
-e1002ceba14d973fcc8abc23619e65b0  -
+061ffdc7a60051a1185b742672b1050a  -
 
 sample_files/trailing_commas_1.js sample_files/trailing_commas_2.js
 9ca72e199466c75f85d00f4d521e85ff  -
