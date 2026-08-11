@@ -32,6 +32,7 @@ pub(crate) enum Language {
     Css,
     Dart,
     DeviceTree,
+    Dockerfile,
     Elixir,
     Elm,
     EmacsLisp,
@@ -133,6 +134,7 @@ pub(crate) fn language_name(language: Language) -> &'static str {
         Css => "CSS",
         Dart => "Dart",
         DeviceTree => "Device Tree",
+        Dockerfile => "Dockerfile",
         Elixir => "Elixir",
         Elm => "Elm",
         EmacsLisp => "Emacs Lisp",
@@ -258,12 +260,20 @@ pub(crate) fn language_globs(language: Language) -> Vec<glob::Pattern> {
         // https://madnight.github.io/githut/
         // Also, treating CUDA as C++
         CPlusPlus => &[
-            "*.cc", "*.cpp", "*.h", "*.hh", "*.hpp", "*.ino", "*.cxx", "*.cu",
+            "*.cc", "*.cpp", "*.c++", "*.cxx", "*.cu", "*.h", "*.hh", "*.hpp", "*.hxx", "*.inl",
+            "*.ino", "*.ipp", "*.ixx", "*.tcc",
         ],
         CSharp => &["*.cs"],
         Css => &["*.css"],
         Dart => &["*.dart"],
         DeviceTree => &["*.dts", "*.dtsi", "*.dtso", "*.its"],
+        Dockerfile => &[
+            "Dockerfile",
+            "Containerfile",
+            "Dockerfile.*",
+            "*.dockerfile",
+            "*.containerfile",
+        ],
         Elm => &["*.elm"],
         EmacsLisp => &["*.el", ".emacs", "_emacs", "Cask"],
         Elixir => &["*.ex", "*.exs"],
@@ -387,7 +397,7 @@ pub(crate) fn language_globs(language: Language) -> Vec<glob::Pattern> {
             "poetry.lock",
             "uv.lock",
         ],
-        TypeScript => &["*.ts"],
+        TypeScript => &["*.ts", "*.cts", "*.mts"],
         TypeScriptTsx => &["*.tsx"],
         Verilog => &["*.v", "*.sv", "*.vh"],
         Vhdl => &["*.vhdl", "*.vhd"],
@@ -641,6 +651,14 @@ mod tests {
     fn test_guess_by_extension() {
         let path = Path::new("foo.el");
         assert_eq!(guess(path, "", &[]), Some(EmacsLisp));
+    }
+
+    #[test]
+    fn test_guess_cplusplus_cplusplus_extension() {
+        // Regression: the `.c++` extension glob was missing its leading `*`
+        // (introduced in 286cad721), so foo.c++ fell through to plain text.
+        let path = Path::new("foo.c++");
+        assert_eq!(guess(path, "", &[]), Some(CPlusPlus));
     }
 
     #[test]

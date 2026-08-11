@@ -1,4 +1,10 @@
-## 0.70 (unreleased)
+## 0.71 (unreleased)
+
+### Parsing
+
+Improved C++, Dockerfile, JavaScript, Rust and TypeScript.
+
+## 0.70 (released 7th August 2026)
 
 ### Diffing
 
@@ -6,10 +12,29 @@ Improved diffing performance, particularly when diffing directories.
 
 ### Parsing
 
-Improved support for Java and TOML.
+Files with parse errors now report the position of the first error, to
+help investigate issues.
+
+Added support for Dockerfiles and Fish shell.
+
+Improved support for Dart, Emacs Lisp, Erlang, Java, OCaml, PHP,
+Protocol Buffers and TOML.
 
 Removed support for Elvish and SCSS (upstream parsers are no longer
 maintained).
+
+### Display
+
+Fixed an issue where files with tabs were not always aligned correctly
+in some build configurations.
+
+Fix an alignment issue with line numbers in side-by-side mode.
+
+### Release
+
+Fixed an issue where prebuilt binaries on GitHub did not respect
+Cargo.lock, so they used newer library versions than tested on
+CI. This caused rendering bugs in source code with tabs.
 
 ## 0.69 (released 30th April 2026)
 
