@@ -1,11 +1,27 @@
 ## 0.71 (unreleased)
 
+### Diffing
+
+Improved linear diffing performance by switching from Wu-Manber to the
+Histogram algorithm. Runtime is slightly improved on average and worst
+case memory usage is substantially improved.
+
+(Linear diffing is used for line-based diffing and word highlighting
+in difftastic. Some diff results have slightly changed due to this
+algorithm change.)
+
 ### Parsing
 
-Improved C++, Dockerfile, Haskell, JavaScript, Rust, Scala and
+Improved C++, Dockerfile, Haskell, JavaScript, Perl, Ruby, Rust, Scala and
 TypeScript.
 
+Improved heuristics and the default globs used for language detection.
+
 Removed Hare support (upstream parser is no longer maintained).
+
+### Command Line Interface
+
+`--context` can now be set with the short flag `-c`.
 
 ## 0.70 (released 7th August 2026)
 

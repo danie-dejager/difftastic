@@ -139,6 +139,9 @@ fn app() -> clap::Command {
     after_help.push('.');
 
     Command::new("Difftastic")
+        // Show options in alphabetical order, rather than in
+        // declaration order.
+        .next_display_order(None)
         .override_usage(USAGE)
         .version(env!("CARGO_PKG_VERSION"))
         .long_version(VERSION.as_str())
@@ -175,6 +178,7 @@ fn app() -> clap::Command {
         .arg(
             Arg::new("context")
                 .long("context")
+                .short('c')
                                 .value_name("LINES")
                 .action(ArgAction::Set)
                 .long_help("The number of contextual lines to show around changed lines.")
@@ -567,6 +571,9 @@ pub(crate) enum Mode {
     },
 }
 
+/// If `lhs_path` and `rhs_path` have a common ending, return that.
+///
+/// For example, given `dir1/foo/bar.py` and `dir2/foo/bar.py`, return `foo/bar.py`.
 fn common_path_suffix(lhs_path: &Path, rhs_path: &Path) -> Option<String> {
     let lhs_rev_components = lhs_path
         .components()
@@ -617,17 +624,19 @@ fn build_display_path(lhs_path: &FileArgument, rhs_path: &FileArgument) -> Strin
     match (lhs_path, rhs_path) {
         (FileArgument::NamedPath(lhs), FileArgument::NamedPath(rhs)) => {
             if is_git_tmpfile(lhs) {
+                // git-difftool calls us with `/tmp/git-blob-abc/bar.txt foo/bar.txt`.
                 return rhs.display().to_string();
             }
 
             match common_path_suffix(lhs, rhs) {
-                Some(common_suffix) => common_suffix,
+                Some(common_suffix) => {
+                    // Handle arguments `/tmp/vcs-abc/foo/bar.txt /home/wilfred/foo/bar.txt`
+                    // as `foo/bar.txt`
+                    common_suffix
+                }
                 None => {
-                    if rhs.extension().is_some() {
-                        rhs.display().to_string()
-                    } else {
-                        lhs.display().to_string()
-                    }
+                    // Given `old.txt new.txt` show `new.txt`.
+                    rhs.display().to_string()
                 }
             }
         }

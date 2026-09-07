@@ -245,7 +245,7 @@ pub(crate) fn language_globs(language: Language) -> Vec<glob::Pattern> {
             "zshenv",
             "zshrc",
         ],
-        Apex => &["*.cls", "*.apexc", "*.trigger"],
+        Apex => &["*.apexc", "*.trigger"],
         C => &["*.c"],
         Clojure => &[
             "*.bb", "*.boot", "*.clj", "*.cljc", "*.clje", "*.cljs", "*.cljx", "*.edn", "*.joke",
@@ -522,7 +522,7 @@ pub(crate) fn guess(
 /// <https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html>
 fn from_emacs_mode_header(src: &str) -> Option<Language> {
     lazy_static! {
-        static ref MODE_RE: Regex = Regex::new(r"-\*-.*mode:([^;]+?);.*-\*-").unwrap();
+        static ref MODE_RE: Regex = Regex::new(r"-\*- *mode: *([a-zA-Z0-9_+-]+).*-\*-").unwrap();
         static ref SHORTHAND_RE: Regex = Regex::new(r"-\*-(.+)-\*-").unwrap();
     }
 
@@ -586,7 +586,7 @@ fn from_emacs_mode_header(src: &str) -> Option<Language> {
 /// Try to guess the language based on a shebang present in the source.
 fn from_shebang(src: &str) -> Option<Language> {
     lazy_static! {
-        static ref RE: Regex = Regex::new(r"#! *(?:/usr/bin/env )?([^ ]+)").unwrap();
+        static ref RE: Regex = Regex::new(r"^#! *(?:/usr/bin/env )?([^ ]+)").unwrap();
     }
     if let Some(first_line) = split_on_newlines(src).next() {
         if let Some(cap) = RE.captures(first_line) {
@@ -597,7 +597,7 @@ fn from_shebang(src: &str) -> Option<Language> {
                         return Some(Bash)
                     }
                     "tcc" => return Some(C),
-                    "lisp" | "sbc" | "ccl" | "clisp" | "ecl" => return Some(CommonLisp),
+                    "lisp" | "sbcl" | "ccl" | "clisp" | "ecl" => return Some(CommonLisp),
                     "elixir" => return Some(Elixir),
                     "escript" => return Some(Erlang),
                     "fish" => return Some(Fish),
@@ -680,6 +680,18 @@ mod tests {
     fn test_guess_by_shebang_with_space() {
         let path = Path::new("foo");
         assert_eq!(guess(path, "#! /bin/sh", &[]), Some(Bash));
+    }
+
+    #[test]
+    fn test_guess_comment_not_shebang() {
+        let path = Path::new("foo.py");
+        assert_eq!(guess(path, "bar = 1 #!/bin/bash", &[]), Some(Python));
+    }
+
+    #[test]
+    fn test_guess_by_emacs_mode_simple() {
+        let path = Path::new("foo");
+        assert_eq!(guess(path, "; -*- mode: Lisp -*-", &[]), Some(CommonLisp));
     }
 
     #[test]
