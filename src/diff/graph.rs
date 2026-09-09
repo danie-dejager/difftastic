@@ -331,10 +331,13 @@ impl Edge {
                 // TODO: Perhaps prefer matching longer strings? It's
                 // probably easier to read.
 
-                // The cost for unchanged nodes can be as low as 1,
-                // but we penalise nodes that have a different depth
+                // We always want non-zero costs, or things get hard
+                // to reason about.
+                let base_cost = 1;
+
+                // We penalise nodes that have a different depth
                 // difference, capped at 40.
-                let base = min(40, depth_difference + 1);
+                let depth_cost = min(40, depth_difference);
 
                 // If the node is only punctuation, increase the
                 // cost. It's better to have unchanged variable names
@@ -349,10 +352,24 @@ impl Edge {
                 // If we have replacements either side of a node
                 // (e.g. see comma_and_comment_1.js), then that's
                 // potentially a cost difference of 200.
-                base + if probably_punctuation { 200 } else { 0 }
+                let punctuation_cost = if probably_punctuation { 200 } else { 0 };
+
+                base_cost + depth_cost + punctuation_cost
             }
             // Matching an outer delimiter is good.
-            EnterUnchangedDelimiter { depth_difference } => 100 + min(40, depth_difference),
+            EnterUnchangedDelimiter { depth_difference } => {
+                // This cost must be less than the novel edges, but
+                // greater than UnchangedNode.
+                //
+                // The shortest route often has a bunch of
+                // EnterUnchangedDelimiter, so preferring a cost
+                // closer to UnchangedNode means we explore slightly
+                // fewer nodes.
+                let base_cost = 10;
+
+                let depth_cost = min(40, depth_difference);
+                base_cost + depth_cost
+            }
 
             // Otherwise, we've added/removed a node.
             NovelAtomLHS {} | NovelAtomRHS {} => 300,
