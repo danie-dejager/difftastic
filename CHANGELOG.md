@@ -1,18 +1,28 @@
-## 0.71 (unreleased)
+## 0.72 (unreleased)
+
+### Display
+
+Fixed an issue with inline display where unchanged lines between two
+nearby changes were not shown.
+
+## 0.71 (released 18th September 2026)
 
 ### Diffing
 
-Improved linear diffing performance by switching from Wu-Manber to the
-Histogram algorithm. Runtime is slightly improved on average and worst
-case memory usage is substantially improved.
+Improved performance, particularly for line-based diffs or
+pathological cases (e.g. an extremely long line).
 
-(Linear diffing is used for line-based diffing and word highlighting
-in difftastic. Some diff results have slightly changed due to this
-algorithm change.)
+Linear diffs (used in line-based diffs and word highlighting) have
+changed from the Wu-Manber algorithm to the Histogram algorithm. This
+is a modest runtime improvement and a large improvement for memory
+usage in worst case scenarios.
+
+Some diff results have slightly changed, although the diff quality
+should be similar. (Please file bugs if not.)
 
 ### Parsing
 
-Improved C++, Dockerfile, Haskell, JavaScript, Perl, Ruby, Rust, Scala and
+Improved C++, Dockerfile, Haskell, JavaScript, Makefile, Perl, Ruby, Rust, Scala and
 TypeScript.
 
 Improved heuristics and the default globs used for language detection.
@@ -22,6 +32,11 @@ Removed Hare support (upstream parser is no longer maintained).
 ### Command Line Interface
 
 `--context` can now be set with the short flag `-c`.
+
+### Release
+
+Prebuilt binaries attached to releases now include the version in the
+filename.
 
 ## 0.70 (released 7th August 2026)
 
